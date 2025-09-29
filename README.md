@@ -19,6 +19,7 @@ npx expo start
 
 5. The server should be running at this point, and you should see a QR code in the terminal. You can scan it on the camera on your phone.
 
+![alt text](<ReadMe Tutorial Pics/Screenshot 2025-09-29 132516.png>)
 This QR code probably wont work if you scan it :(
 
 6. There is an app called Expo Go on the App Store that saves your scanned QR codes and allows you to view the server on your 
