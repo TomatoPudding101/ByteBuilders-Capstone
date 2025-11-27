@@ -17,7 +17,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 
-const BG_IMAGE = require('../assets/images/login_bg.png');
+const BG_IMAGE = require('../assets/images/adult-bg.png');
 
 export default function LoginScreen() {
     const [studentId, setStudentId] = useState('');
