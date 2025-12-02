@@ -19,11 +19,11 @@ const BG_IMAGE = require( '../assets/images/login_bg.png');
 const { width } = Dimensions.get('window');
 
 export default function LoginScreen() {
-    const [studentId, setStudentId] = useState('');
+    const [parentId, setParentId] = useState('');
     const [password, setPassword] = useState('');
 
     const handleSignIn = () => {
-        console.log('Signing in pressed', studentId, password);
+        console.log('Signing in pressed', parentId, password);
         // Example: navigation.replace?.('MainTabs');
     };
 
@@ -61,12 +61,12 @@ export default function LoginScreen() {
                         <View style={styles.inputRow}>
                             <TextInput
                                 style={styles.input}
-                                value={studentId}
-                                onChangeText={setStudentId}
-                                placeholder="Enter your Student ID"
+                                value={parentId}
+                                onChangeText={setParentId}
+                                placeholder="Enter your Parent ID"
                                 autoCapitalize="none"
                                 keyboardType="default"
-                                accessibilityLabel="Student ID input"
+                                accessibilityLabel="Parent ID input"
                             />
                             {/* Decorative icon placeholder */}
                             <Image style={styles.leftIcon} source={BG_IMAGE} />
