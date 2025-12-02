@@ -14,10 +14,9 @@ import {
     Dimensions
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+const BG_IMAGE = require( '../assets/images/login_bg.png');
 
-const { width, height } = Dimensions.get('window');
-
-const BG_IMAGE = require('../assets/images/adult-bg.png');
+const { width } = Dimensions.get('window');
 
 export default function LoginScreen() {
     const [studentId, setStudentId] = useState('');
@@ -108,7 +107,7 @@ export default function LoginScreen() {
 
                         <View style={styles.divider} />
 
-                        <Text style={styles.footerText}>Don't have an account</Text>
+                        <Text style={styles.footerText}>No Account?</Text>
                         <TouchableOpacity accessibilityRole="button">
                             <Text style={styles.createAccount}>Create Account</Text>
                         </TouchableOpacity>
