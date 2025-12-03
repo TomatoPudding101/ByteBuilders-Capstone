@@ -5,16 +5,16 @@ import {
     TextInput,
     TouchableOpacity,
     StyleSheet,
-    Image,
     ImageBackground,
     StatusBar,
     Platform,
     KeyboardAvoidingView,
     ScrollView,
     Dimensions,
+    ColorValue,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ColorValue } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 const BG_IMAGE = require( '../assets/images/adult-bg.png');
@@ -22,81 +22,86 @@ const BG_IMAGE = require( '../assets/images/adult-bg.png');
 export default function LoginScreen() {
     const [parentId, setParentId] = useState('');
     const [password, setPassword] = useState('');
-    const [theme, setTheme] = useState<'light' | 'dark'>('light');
+    const [darkMode, setDarkMode] = useState(false);
 
     const handleSignIn = () => {
         console.log('Signing in with', parentId, password);
         // Example: navigation.replace?.('MainTabs');
     };
 
-    const gradientColors: readonly [ColorValue, ColorValue, ColorValue] =
-        theme === 'light'
-        ? ['#2E21E5D6', '#8E1DD0D6', '#ED2E65D6']
-        : ['#4b3bff', '#a22ee0', '#ff2f65'];
+    const gradientColors : readonly [string, string, string]= darkMode
+        ? ['#4b3bff', '#a22ee0', '#ff2f65']
+        : ['#2E21E5', '#8E1DD0', '#ED2E65'];
         
-    
-    const cardBg = theme === 'light' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)';
-    const inputBg = theme === 'light' ? '#FFF' : '#1E1E1E';
-    const inputColor = theme === 'light' ? '#000' : '#FFF';
-    const labelColor = theme === 'light' ? '#757575' : '#CCC';
+    const cardBg = darkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)';
+    const inputBg = darkMode ? '#FFF' : '#1E1E1E';
+    const inputColor = darkMode ? '#000' : '#FFF';
+    const labelColor = darkMode ? '#757575' : '#CCC';
+    const screenOverlay = darkMode ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.1)';
 
     return (
-        <KeyboardAvoidingView
-            style={styles.flex}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        >
-            <StatusBar barStyle={theme === 'light' ? 'dark-content' : 'light-content'} translucent backgroundColor="transparent" />
+        <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+            <StatusBar barStyle={darkMode ? 'light-content' : 'dark-content'} translucent backgroundColor="transparent" />
             
-            <ImageBackground source={BG_IMAGE} style={styles.bg} resizeMode="cover">
+            <ImageBackground source={BG_IMAGE} style={[styles.bg, {backgroundColor: screenOverlay }]} resizeMode="cover">
+                {/* Moon/Sun toggle top right */}
+                <TouchableOpacity
+                    style={styles.iconToggle}
+                    onPress={() => setDarkMode(!darkMode)}
+                    accessibilityRole="switch"
+                >
+                    <Ionicons
+                        name={darkMode ? "moon" : "sunny"}
+                        size={28}
+                        color={darkMode ?  "#fff" : "#000"}
+                    />
+                </TouchableOpacity>
+                
                 <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
                     {/* Top Brand */}
                     <View style={styles.topContainer}>
-                        <Text style={styles.brand}>RemindME</Text>
-                        <Text style={styles.subtitle}>Your accessible reminder companion</Text>
+                        <Text style={[styles.brand, { color: darkMode ? '#FFD700' : '#FFB700 '}]}>RemindME</Text>
+                        <Text style={[styles.subtitle, { color: labelColor }]}>Your accessible reminder companion</Text>
                     </View>
 
                     {/* Card */}
-                    <View style={styles.card}>
-                        <Text style={styles.welcome}>Welcome Back</Text>
+                    <View style={[styles.card, { backgroundColor: cardBg }]}>
+                        <Text style={[styles.welcome, { color: gradientColors[0] }]}>Welcome Back</Text>
 
                         {/* Parent ID Input */}
                         <Text style={styles.label}>Parent ID</Text>
-                            <TextInput
-                                style={[styles.input, { backgroundColor: inputBg, color: inputColor }]}
-                                value={parentId}
-                                onChangeText={setParentId}
-                                placeholder="Enter your Parent ID"
-                                placeholderTextColor="#999"
-                                autoCapitalize="none"
-                                keyboardType="default"
-                                accessibilityLabel="Parent ID input"
-                            />
+                        <TextInput
+                            style={[styles.input, { backgroundColor: inputBg, color: inputColor }]}
+                            value={parentId}
+                            onChangeText={setParentId}
+                            placeholder="Enter your Parent ID"
+                            placeholderTextColor="#999"
+                            autoCapitalize="none"
+                            keyboardType="default"
+                            accessibilityLabel="Parent ID input"
+                        />
 
                         {/* Password Input */}
                         <Text style={[styles.label, { color: labelColor }]}>Password</Text>
-                            <TextInput
-                                style={[styles.input, { backgroundColor: inputBg, color: inputColor }]}
-                                value={password}
-                                onChangeText={setPassword}
-                                placeholder="Enter your password"
-                                secureTextEntry
-                                autoCapitalize="none"
-                            />
+                        <TextInput
+                            style={[styles.input, { backgroundColor: inputBg, color: inputColor }]}
+                            value={password}
+                            onChangeText={setPassword}
+                            placeholder="Enter your password"
+                            placeholderTextColor="#999"
+                            secureTextEntry
+                            autoCapitalize="none"
+                        />
 
                         {/* Sign In Button */}
                         <TouchableOpacity onPress={handleSignIn} activeOpacity={0.85} style={{marginTop: 18}}>
-                            <LinearGradient 
-                                colors={gradientColors} 
-                                start={[0, 0]} 
-                                end={[1, 0]} 
-                                style={styles.signInButton}
-                            >
+                            <LinearGradient colors={gradientColors} start={[0, 0]} end={[1, 0]} style={styles.signInButton}>
                                 <Text style={styles.signInText}>Sign In</Text>
                             </LinearGradient>
                         </TouchableOpacity>
 
                         {/* Divider */}
-                        <View style={[styles.divider, {backgroundColor: gradientColors[0]}]} />
+                        <View style={[styles.divider, {backgroundColor: gradientColors[0] }]} />
 
                         {/* Footer */}
                         <Text style={[styles.footerText, { color: labelColor }]}>No Account?</Text>
@@ -123,7 +128,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingBottom: 48,
     },
-
     topContainer: {
         alignItems: 'center',
         marginBottom: 24,
@@ -141,7 +145,12 @@ const styles = StyleSheet.create({
         width: Math.min(272, width * 0.9),
         marginTop: 6,
     },
-
+    iconToggle: {
+        position: 'absolute',
+        top: Platform.OS === 'android' ? 40 : 64,
+        right: 16,
+        zIndex: 10,
+    },
     card: {
         width: '86%',
         maxWidth: 328,
@@ -158,7 +167,6 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         textAlign: 'center',
     },
-
     label: {
         fontSize: 14,
         fontWeight: '600',
@@ -185,7 +193,6 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         textAlign: 'center',
     },
-
     divider: {
         height: 1,
         marginTop: 18,
@@ -201,7 +208,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 12,
         fontWeight: '600',
-        marginTop: 6,
+        marginTop: 4,
     },
 
 });
