@@ -11,42 +11,44 @@ import {
     Platform,
     KeyboardAvoidingView,
     ScrollView,
-    Dimensions
+    Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-const BG_IMAGE = require( '../assets/images/login_bg.png');
+import { ColorValue } from 'react-native';
 
 const { width } = Dimensions.get('window');
+const BG_IMAGE = require( '../assets/images/adult-bg.png');
 
 export default function LoginScreen() {
     const [parentId, setParentId] = useState('');
     const [password, setPassword] = useState('');
+    const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
     const handleSignIn = () => {
-        console.log('Signing in pressed', parentId, password);
+        console.log('Signing in with', parentId, password);
         // Example: navigation.replace?.('MainTabs');
     };
+
+    const gradientColors: readonly [ColorValue, ColorValue, ColorValue] =
+        theme === 'light'
+        ? ['#2E21E5D6', '#8E1DD0D6', '#ED2E65D6']
+        : ['#4b3bff', '#a22ee0', '#ff2f65'];
+        
+    
+    const cardBg = theme === 'light' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)';
+    const inputBg = theme === 'light' ? '#FFF' : '#1E1E1E';
+    const inputColor = theme === 'light' ? '#000' : '#FFF';
+    const labelColor = theme === 'light' ? '#757575' : '#CCC';
 
     return (
         <KeyboardAvoidingView
             style={styles.flex}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-            <StatusBar
-                barStyle="dark-content"
-                translucent
-                backgroundColor="transparent"
-            />
-
-            <ImageBackground
-                source={BG_IMAGE}
-                style={styles.bg}
-                resizeMode="cover"
-            >
-                <ScrollView
-                    contentContainerStyle={styles.scrollContainer}
-                    keyboardShouldPersistTaps="handled"
-                >
+            <StatusBar barStyle={theme === 'light' ? 'dark-content' : 'light-content'} translucent backgroundColor="transparent" />
+            
+            <ImageBackground source={BG_IMAGE} style={styles.bg} resizeMode="cover">
+                <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
                     {/* Top Brand */}
                     <View style={styles.topContainer}>
                         <Text style={styles.brand}>RemindME</Text>
@@ -57,59 +59,49 @@ export default function LoginScreen() {
                     <View style={styles.card}>
                         <Text style={styles.welcome}>Welcome Back</Text>
 
-                        <Text style={styles.label}>Student ID</Text>
-                        <View style={styles.inputRow}>
+                        {/* Parent ID Input */}
+                        <Text style={styles.label}>Parent ID</Text>
                             <TextInput
-                                style={styles.input}
+                                style={[styles.input, { backgroundColor: inputBg, color: inputColor }]}
                                 value={parentId}
                                 onChangeText={setParentId}
                                 placeholder="Enter your Parent ID"
+                                placeholderTextColor="#999"
                                 autoCapitalize="none"
                                 keyboardType="default"
                                 accessibilityLabel="Parent ID input"
                             />
-                            {/* Decorative icon placeholder */}
-                            <Image style={styles.leftIcon} source={BG_IMAGE} />
-                        </View>
 
-                        <Text style={styles.label}>Password</Text>
-                        <View style={styles.inputRow}>
+                        {/* Password Input */}
+                        <Text style={[styles.label, { color: labelColor }]}>Password</Text>
                             <TextInput
-                            style={styles.input}
-                            value={password}
-                            onChangeText={setPassword}
-                            placeholder="Enter your password"
-                            secureTextEntry
-                            autoCapitalize="none"
-                            accessibilityLabel="Password input"
+                                style={[styles.input, { backgroundColor: inputBg, color: inputColor }]}
+                                value={password}
+                                onChangeText={setPassword}
+                                placeholder="Enter your password"
+                                secureTextEntry
+                                autoCapitalize="none"
                             />
-                            <Image style={styles.leftIconSmall} source={BG_IMAGE} />
-                        </View>
 
-                        <TouchableOpacity
-                            onPress={handleSignIn}
-                            activeOpacity={0.85}
-                            accessibilityRole="button"
-                            accessibilityLabel="Sign In"
-                        >
-                            <LinearGradient
-                                colors={[
-                                    'rgba(46,33,229,0.84)',
-                                    'rgba(142,29.208,0.84)',
-                                    'rgba(237,46,101,0.84)',
-                                ]}
-                                start={[0, 0]}
-                                end={[1, 0]}
+                        {/* Sign In Button */}
+                        <TouchableOpacity onPress={handleSignIn} activeOpacity={0.85} style={{marginTop: 18}}>
+                            <LinearGradient 
+                                colors={gradientColors} 
+                                start={[0, 0]} 
+                                end={[1, 0]} 
+                                style={styles.signInButton}
                             >
-                                <Text style={styles.signInButton}>Sign In</Text>
+                                <Text style={styles.signInText}>Sign In</Text>
                             </LinearGradient>
                         </TouchableOpacity>
 
-                        <View style={styles.divider} />
+                        {/* Divider */}
+                        <View style={[styles.divider, {backgroundColor: gradientColors[0]}]} />
 
-                        <Text style={styles.footerText}>No Account?</Text>
-                        <TouchableOpacity accessibilityRole="button">
-                            <Text style={styles.createAccount}>Create Account</Text>
+                        {/* Footer */}
+                        <Text style={[styles.footerText, { color: labelColor }]}>No Account?</Text>
+                        <TouchableOpacity>
+                            <Text style={[styles.createAccount, { color: labelColor}]}>Create Account</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
@@ -125,7 +117,6 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.10)',
         paddingTop: Platform.OS === 'android' ? 40 : 64,
     },
     scrollContainer: {
@@ -155,94 +146,59 @@ const styles = StyleSheet.create({
         width: '86%',
         maxWidth: 328,
         minHeight: 472,
-        backgroundColor: 'rgba(255,255,255,0.60)',
         borderRadius: 8,
         paddingVertical: 20,
         paddingHorizontal: 20,
         alignItems: 'stretch',
         marginTop: 6,
     },
-
     welcome: {
         fontSize: 32,
-        color: 'rgba(203,94,125,0.84)',
         fontWeight: '400',
         marginBottom: 12,
+        textAlign: 'center',
     },
 
     label: {
-        color: '#757575',
         fontSize: 14,
         fontWeight: '600',
         marginTop: 12,
         marginBottom: 6,
     },
-
-    inputRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        position: 'relative',
-        marginBottom: 6,
-    },
-
     input: {
-        flex: 1,
         height: 48,
         borderRadius: 8,
         borderWidth: 1,
         borderColor: '#E0E0E0',
         paddingHorizontal: 16,
-        backgroundColor: '#FFFFFF',
-        color: '#000000',
+        fontSize: 16,
     },
-
-    leftIcon: {
-        width: 24,
-        height: 24,
-        position: 'absolute',
-        left: 8,
-        top: 12,
-        opacity: 0,
-    },
-    leftIconSmall: {
-        width: 20,
-        height: 20,
-        position: 'absolute',
-        left: 8,
-        top: 14,
-        opacity: 0,
-    },
-
     signInButton: {
-        height: 44,
+        height: 48,
         borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 18,
     },
     signInText: {
         color: '#F5F5F5',
         fontSize: 16,
         fontWeight: '700',
+        textAlign: 'center',
     },
 
     divider: {
         height: 1,
-        backgroundColor: '#FFB700',
         marginTop: 18,
         marginBottom: 12,
     },
-
     footerText: {
         textAlign: 'center',
-        color: '#757575',
         fontSize: 12,
         fontWeight: '600',
         marginTop: 6,
     },
     createAccount: {
         textAlign: 'center',
-        color: '#757575',
         fontSize: 12,
         fontWeight: '600',
         marginTop: 6,
