@@ -29,7 +29,7 @@ export default function LoginScreen() {
         // Example: navigation.replace?.('MainTabs');
     };
 
-    const gradientColors : readonly [string, string, string]= darkMode
+    const gradientColors : readonly [ColorValue, ColorValue, ColorValue]= darkMode
         ? ['#4b3bff', '#a22ee0', '#ff2f65']
         : ['#2E21E5', '#8E1DD0', '#ED2E65'];
         
