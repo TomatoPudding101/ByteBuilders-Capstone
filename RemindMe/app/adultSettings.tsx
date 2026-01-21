@@ -31,9 +31,6 @@ const AdultSettings = () => {
                     <Ionicons name="arrow-back" size={24} color="#9333EA" />
                     <Text style={styles.backText}>Back to Dashboard</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.moonIcon}>
-                    <Ionicons name="moon-outline" size={24} color="#9333EA" />
-                </TouchableOpacity>
             </View>
 
             {/* Title */}
@@ -162,9 +159,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#FDF4F5',
     },
 
-    moonIcon: {
-        padding: 2
-    },
 
     titleContainer: {
         paddingHorizontal: 20,
