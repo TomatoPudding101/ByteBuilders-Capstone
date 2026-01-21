@@ -34,6 +34,13 @@ export default function HomeScreen() {
         </Link>
       </ThemedView>
 
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">2: Go to adult app settings</ThemedText>
+        <Link href="/adultSettings" style={styles.loginLink}>
+          <ThemedText type="link">adult app settings</ThemedText>
+        </Link>
+      </ThemedView>
+
     </ParallaxScrollView>
   );
 }
