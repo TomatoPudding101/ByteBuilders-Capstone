@@ -1,50 +1,31 @@
-# Welcome to your Expo app 👋
+# ByteBuilders-Capstone
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Here are the steps to run the development server:
 
-## Get started
+1. Clone either the main or test branch.(Probably clone main at this time of writing)
 
-1. Install dependencies
+2. Make sure that the repo was succefully cloned. In VSCode the left side bar should look like this:
 
-   ```bash
-   npm install
-   ```
+![alt text](<ReadMe Tutorial Pics/image.png>)
 
-2. Start the app
+2. Change directory to RemindMe in VSCode terminal:
+cd RemindMe (if you type R and then tab it should autocomplete).
 
-   ```bash
-   npx expo start
-   ```
+3. If you haven't already run this command to install EXPO cli globally:
+npm install -g expo-cli
 
-In the output, you'll find options to open the app in a
+4. Start the development server with:
+npx expo start
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+5. The server should be running at this point, and you should see a QR code in the terminal. You can scan it on the camera on your phone.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+![alt text](<ReadMe Tutorial Pics/Screenshot 2025-09-29 132516.png>)
+This QR code probably wont work if you scan it :(
 
-## Get a fresh project
+6. There is an app called Expo Go on the App Store that saves your scanned QR codes and allows you to view the server on your 
+   phone provided that you did npx expo start. You can make an account. It should allow you to see both Android and IOS development.
 
-When you're ready, run:
+7. To make changes to the app, follow through this path: 
+RemindMe\app\(tabs)\index.tsx
 
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+8. Happy coding! Let me know if you need help or if youre struggling to get the dev server up and running.
