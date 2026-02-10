@@ -19,10 +19,26 @@ const AdultSettings = () => {
   >("profile");
   const [fullName, setFullName] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
+  const [isDarkMode, setDarkMode] = useState(false);
+
+  const theme = {
+    background: isDarkMode ? "#1F2937" : "#FDF4F5",
+    cardBackground: isDarkMode ? "#374151" : "#FFF",
+    text: isDarkMode ? "#F9FAFB" : "#333",
+    textSecondary: isDarkMode ? "#D1D5DB" : "#666",
+    textTertiary: isDarkMode ? "#9CA3AF" : "#999",
+    primary: "#9333EA",
+    inputBackground: isDarkMode ? "#4B5563" : "#F9FAFB",
+    inputBorder: isDarkMode ? "#6B7280" : "#E5E7EB",
+    border: isDarkMode ? "#4B5563" : "#F3F4F6",
+  };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
-      <StatusBar barStyle="dark-content" />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.background }]}
+      edges={["top", "left", "right"]}
+    >
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
 
       {/* Heading */}
       <View style={styles.header}>
@@ -105,53 +121,131 @@ const AdultSettings = () => {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Profile Information */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Profile Information</Text>
-            <TouchableOpacity style={styles.editButton}>
-              <Text style={styles.editButtonText}>Edit Profile</Text>
-            </TouchableOpacity>
-          </View>
+        {activeTab === "profile" && (
+          <>
+            {/* Profile Information */}
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardTitle}>Profile Information</Text>
+                <TouchableOpacity style={styles.editButton}>
+                  <Text style={styles.editButtonText}>Edit Profile</Text>
+                </TouchableOpacity>
+              </View>
 
-          <Text style={styles.cardSubtitle}>Update your personal details</Text>
+              <Text style={styles.cardSubtitle}>
+                Update your personal details
+              </Text>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Full Name</Text>
-            <TextInput
-              style={styles.input}
-              value={fullName}
-              onChangeText={setFullName}
-              placeholder="Enter your full name"
-              placeholderTextColor="#999"
-            />
-          </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Full Name</Text>
+                <TextInput
+                  style={styles.input}
+                  value={fullName}
+                  onChangeText={setFullName}
+                  placeholder="Enter your full name"
+                  placeholderTextColor="#999"
+                />
+              </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email Address</Text>
-            <TextInput
-              style={styles.input}
-              value={emailAddress}
-              onChangeText={setEmailAddress}
-              placeholder="Enter your email address"
-              placeholderTextColor="#999"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-        </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Email Address</Text>
+                <TextInput
+                  style={styles.input}
+                  value={emailAddress}
+                  onChangeText={setEmailAddress}
+                  placeholder="Enter your email address"
+                  placeholderTextColor="#999"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
+            </View>
 
-        {/* Account Actions */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Account Actions</Text>
+            {/* Account Actions */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Account Actions</Text>
 
-          <TouchableOpacity
-            style={styles.signOutButton}
-            onPress={() => router.push("/login")}
-          >
-            <Text style={styles.signOutText}>Sign Out</Text>
-          </TouchableOpacity>
-        </View>
+              <TouchableOpacity
+                style={styles.signOutButton}
+                onPress={() => router.push("/login")}
+              >
+                <Text style={styles.signOutText}>Sign Out</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+
+        {activeTab === "preferences" && (
+          <>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Notification Preferences</Text>
+              <Text style={styles.cardSubtitle}>
+                Manage notification settings
+              </Text>
+
+              <Text style={styles.label}>Coming soon...</Text>
+            </View>
+
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>App Preferences</Text>
+              <Text style={styles.cardSubtitle}>
+                Customize your app experience
+              </Text>
+
+              <Text style={styles.label}>Coming soon...</Text>
+            </View>
+          </>
+        )}
+
+        {activeTab === "accessibility" && (
+          <>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Accessibility Options</Text>
+              <Text style={styles.cardSubtitle}>
+                Customize accessibility features
+              </Text>
+
+              <Text style={styles.label}>Coming soon...</Text>
+            </View>
+
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Display Settings</Text>
+              <Text style={styles.cardSubtitle}>
+                Adjust text size and contrast
+              </Text>
+
+              <View style={styles.settingRow}>
+                <View style={styles.settingInfo}>
+                  <Text style={[styles.label, { color: theme.text }]}>
+                    Dark Mode
+                  </Text>
+                  <Text
+                    style={[
+                      styles.settingDescription,
+                      { color: theme.textTertiary },
+                    ]}
+                  >
+                    Enable dark theme
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={[
+                    styles.toggleButton,
+                    isDarkMode && styles.toggleButtonActive,
+                  ]}
+                  onPress={() => setDarkMode(!isDarkMode)}
+                >
+                  <View
+                    style={[
+                      styles.toggleCircle,
+                      isDarkMode && styles.toggleCircleActive,
+                    ]}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>
+        )}
 
         <View style={{ height: 100 }} />
       </ScrollView>
@@ -359,6 +453,54 @@ const styles = StyleSheet.create({
 
   navItem: {
     padding: 8,
+  },
+
+  settingRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#F3F4F6",
+    marginTop: 12,
+  },
+
+  settingInfo: {
+    flex: 1,
+  },
+
+  settingDescription: {
+    fontSize: 12,
+    marginTop: 4,
+  },
+
+  toggleButton: {
+    width: 51,
+    height: 31,
+    borderRadius: 16,
+    backgroundColor: "#D1D5DB",
+    padding: 2,
+    justifyContent: "center",
+  },
+
+  toggleButtonActive: {
+    backgroundColor: "#9333EA",
+  },
+
+  toggleCircle: {
+    width: 27,
+    height: 27,
+    borderRadius: 14,
+    backgroundColor: "#FFF",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+
+  toggleCircleActive: {
+    transform: [{ translateX: 20 }],
   },
 });
 

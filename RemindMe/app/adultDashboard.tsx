@@ -1,10 +1,10 @@
 import React from "react";
 import {
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -27,9 +27,6 @@ const AdultDashboard = () => {
             <Text style={styles.username}>TestUser</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.moonIcon}>
-          <Ionicons name="moon-outline" size={24} color="#9333EA" />
-        </TouchableOpacity>
       </View>
 
       {/* Stats */}
@@ -54,11 +51,6 @@ const AdultDashboard = () => {
           <Text style={styles.statLabel}>Progress</Text>
         </View>
       </View>
-
-      {/* Add Reminder Button */}
-      <TouchableOpacity style={styles.addButton}>
-        <Text style={styles.addButtonText}>+ Add Reminder</Text>
-      </TouchableOpacity>
 
       {/* Action Icons Row */}
       <View style={styles.actionRow}>
@@ -138,9 +130,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#666",
   },
-  moonIcon: {
-    padding: 8,
-  },
+
   statsGrid: {
     flexDirection: "row",
     alignItems: "center",
@@ -190,19 +180,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#999",
     textAlign: "center",
-  },
-  addButton: {
-    backgroundColor: "#9333EA",
-    marginHorizontal: 20,
-    marginTop: 10,
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  addButtonText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "600",
   },
   actionRow: {
     flexDirection: "row",
