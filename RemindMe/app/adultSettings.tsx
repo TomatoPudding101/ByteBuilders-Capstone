@@ -1,3 +1,5 @@
+import { useTheme } from "./ThemeContext";
+
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -14,24 +16,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const AdultSettings = () => {
   const router = useRouter();
+  const { isDarkMode, toggleDarkMode, theme } = useTheme();
   const [activeTab, setActiveTab] = useState<
     "profile" | "preferences" | "accessibility"
   >("profile");
   const [fullName, setFullName] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
-  const [isDarkMode, setDarkMode] = useState(false);
-
-  const theme = {
-    background: isDarkMode ? "#1F2937" : "#FDF4F5",
-    cardBackground: isDarkMode ? "#374151" : "#FFF",
-    text: isDarkMode ? "#F9FAFB" : "#333",
-    textSecondary: isDarkMode ? "#D1D5DB" : "#666",
-    textTertiary: isDarkMode ? "#9CA3AF" : "#999",
-    primary: "#9333EA",
-    inputBackground: isDarkMode ? "#4B5563" : "#F9FAFB",
-    inputBorder: isDarkMode ? "#6B7280" : "#E5E7EB",
-    border: isDarkMode ? "#4B5563" : "#F3F4F6",
-  };
 
   return (
     <SafeAreaView
@@ -47,20 +37,36 @@ const AdultSettings = () => {
           onPress={() => router.push("/adultDashboard")}
         >
           <Ionicons name="arrow-back" size={24} color="#9333EA" />
-          <Text style={styles.backText}>Back to Dashboard</Text>
+          <Text
+            style={[
+              styles.backText,
+              { backgroundColor: theme.background, color: theme.text },
+            ]}
+          >
+            Back to Dashboard
+          </Text>
         </TouchableOpacity>
       </View>
 
       {/* Title */}
       <View style={styles.titleContainer}>
-        <Text style={styles.settingsLabel}>settings</Text>
+        <Text style={[styles.settingsLabel, { color: theme.text }]}>
+          settings
+        </Text>
         <Text style={styles.pageTitle}>Account Settings</Text>
       </View>
 
       {/* Tabs */}
       <View style={styles.tabContainer}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === "profile" && styles.tabActive]}
+          style={[
+            styles.tab,
+            activeTab === "profile" && styles.tabActive,
+            {
+              backgroundColor: theme.cardBackground,
+              borderColor: theme.border,
+            },
+          ]}
           onPress={() => setActiveTab("profile")}
         >
           <Ionicons
@@ -72,6 +78,7 @@ const AdultSettings = () => {
             style={[
               styles.tabText,
               activeTab === "profile" && styles.tabTextActive,
+              { color: theme.text },
             ]}
           >
             Profile
@@ -79,7 +86,14 @@ const AdultSettings = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.tab, activeTab === "preferences" && styles.tabActive]}
+          style={[
+            styles.tab,
+            activeTab === "preferences" && styles.tabActive,
+            {
+              backgroundColor: theme.cardBackground,
+              borderColor: theme.border,
+            },
+          ]}
           onPress={() => setActiveTab("preferences")}
         >
           <Ionicons
@@ -91,6 +105,7 @@ const AdultSettings = () => {
             style={[
               styles.tabText,
               activeTab === "preferences" && styles.tabTextActive,
+              { color: theme.text },
             ]}
           >
             Preferences
@@ -101,6 +116,10 @@ const AdultSettings = () => {
           style={[
             styles.tab,
             activeTab === "accessibility" && styles.tabActive,
+            {
+              backgroundColor: theme.cardBackground,
+              borderColor: theme.border,
+            },
           ]}
           onPress={() => setActiveTab("accessibility")}
         >
@@ -113,6 +132,7 @@ const AdultSettings = () => {
             style={[
               styles.tabText,
               activeTab === "accessibility" && styles.tabTextActive,
+              { color: theme.text },
             ]}
           >
             Accessibility
@@ -124,37 +144,63 @@ const AdultSettings = () => {
         {activeTab === "profile" && (
           <>
             {/* Profile Information */}
-            <View style={styles.card}>
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: theme.cardBackground,
+                  borderColor: theme.inputBorder,
+                },
+              ]}
+            >
               <View style={styles.cardHeader}>
-                <Text style={styles.cardTitle}>Profile Information</Text>
+                <Text style={[styles.cardTitle, { color: theme.text }]}>
+                  Profile Information
+                </Text>
                 <TouchableOpacity style={styles.editButton}>
                   <Text style={styles.editButtonText}>Edit Profile</Text>
                 </TouchableOpacity>
               </View>
 
-              <Text style={styles.cardSubtitle}>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
                 Update your personal details
               </Text>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Full Name</Text>
+                <Text style={[styles.label, { color: theme.text }]}>
+                  Full Name
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: theme.inputBackground,
+                      borderColor: theme.border,
+                    },
+                  ]}
                   value={fullName}
                   onChangeText={setFullName}
                   placeholder="Enter your full name"
-                  placeholderTextColor="#999"
+                  placeholderTextColor="#95badf"
                 />
               </View>
 
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Email Address</Text>
+                <Text style={[styles.label, { color: theme.text }]}>
+                  Email Address
+                </Text>
                 <TextInput
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: theme.inputBackground,
+                      borderColor: theme.border,
+                    },
+                  ]}
                   value={emailAddress}
                   onChangeText={setEmailAddress}
                   placeholder="Enter your email address"
-                  placeholderTextColor="#999"
+                  placeholderTextColor="#95badf"
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
@@ -162,14 +208,26 @@ const AdultSettings = () => {
             </View>
 
             {/* Account Actions */}
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Account Actions</Text>
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                Account Actions
+              </Text>
 
               <TouchableOpacity
-                style={styles.signOutButton}
+                style={[
+                  styles.signOutButton,
+                  {
+                    backgroundColor: theme.inputBackground,
+                    borderColor: theme.inputBorder,
+                  },
+                ]}
                 onPress={() => router.push("/login")}
               >
-                <Text style={styles.signOutText}>Sign Out</Text>
+                <Text style={[styles.signOutText, { color: theme.text }]}>
+                  Sign Out
+                </Text>
               </TouchableOpacity>
             </View>
           </>
@@ -177,44 +235,66 @@ const AdultSettings = () => {
 
         {activeTab === "preferences" && (
           <>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Notification Preferences</Text>
-              <Text style={styles.cardSubtitle}>
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                Notification Preferences
+              </Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
                 Manage notification settings
               </Text>
 
-              <Text style={styles.label}>Coming soon...</Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Coming soon...
+              </Text>
             </View>
 
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>App Preferences</Text>
-              <Text style={styles.cardSubtitle}>
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                App Preferences
+              </Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
                 Customize your app experience
               </Text>
 
-              <Text style={styles.label}>Coming soon...</Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Coming soon...
+              </Text>
             </View>
           </>
         )}
 
         {activeTab === "accessibility" && (
           <>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Accessibility Options</Text>
-              <Text style={styles.cardSubtitle}>
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                Accessibility Options
+              </Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
                 Customize accessibility features
               </Text>
 
-              <Text style={styles.label}>Coming soon...</Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Coming soon...
+              </Text>
             </View>
 
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Display Settings</Text>
-              <Text style={styles.cardSubtitle}>
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                Display Settings
+              </Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
                 Adjust text size and contrast
               </Text>
 
-              <View style={styles.settingRow}>
+              <View style={[styles.settingRow, { borderColor: theme.border }]}>
                 <View style={styles.settingInfo}>
                   <Text style={[styles.label, { color: theme.text }]}>
                     Dark Mode
@@ -233,7 +313,7 @@ const AdultSettings = () => {
                     styles.toggleButton,
                     isDarkMode && styles.toggleButtonActive,
                   ]}
-                  onPress={() => setDarkMode(!isDarkMode)}
+                  onPress={toggleDarkMode}
                 >
                   <View
                     style={[
@@ -251,7 +331,15 @@ const AdultSettings = () => {
       </ScrollView>
 
       {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
+      <View
+        style={[
+          styles.bottomNav,
+          {
+            backgroundColor: theme.cardBackground,
+            borderTopColor: theme.border,
+          },
+        ]}
+      >
         <TouchableOpacity
           style={styles.navItem}
           onPress={() => router.push("/adultDashboard")}
