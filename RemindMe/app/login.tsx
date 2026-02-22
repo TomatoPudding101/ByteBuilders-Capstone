@@ -1,3 +1,5 @@
+import { useTheme } from "./ThemeContext";
+
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -18,13 +20,12 @@ import {
 } from "react-native";
 
 const { width } = Dimensions.get("window");
-const BG_IMAGE = require("../assets/images/adult-bg.png");
 
 export default function LoginScreen() {
   const [parentId, setParentId] = useState("");
   const [password, setPassword] = useState("");
-  const [darkMode, setDarkMode] = useState(false);
   const router = useRouter();
+  const { isDarkMode: darkMode, toggleDarkMode, theme } = useTheme();
 
   const handleSignIn = () => {
     console.log("Signing in with", parentId, password);
@@ -35,12 +36,6 @@ export default function LoginScreen() {
   const gradientColors: readonly [ColorValue, ColorValue, ColorValue] = darkMode
     ? ["#4b3bff", "#a22ee0", "#ff2f65"]
     : ["#2E21E5", "#8E1DD0", "#ED2E65"];
-
-  const cardBg = darkMode ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)";
-  const inputBg = darkMode ? "#FFF" : "#1E1E1E";
-  const inputColor = darkMode ? "#000" : "#FFF";
-  const labelColor = darkMode ? "#757575" : "#CCC";
-  const screenOverlay = darkMode ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.1)";
 
   return (
     <KeyboardAvoidingView
@@ -53,15 +48,21 @@ export default function LoginScreen() {
         backgroundColor="transparent"
       />
 
+      <LinearGradient
+        colors={
+          darkMode ? ["#1f2937", "#1f2937"] : ["#fff0f0", "#f0f4ff", "#f0fff4"]
+        }
+        style={StyleSheet.absoluteFill}
+      />
+
       <ImageBackground
-        source={BG_IMAGE}
-        style={[styles.bg, { backgroundColor: screenOverlay }]}
+        style={[styles.bg, { backgroundColor: theme.background }]}
         resizeMode="cover"
       >
         {/* Moon/Sun toggle top right */}
         <TouchableOpacity
           style={styles.iconToggle}
-          onPress={() => setDarkMode(!darkMode)}
+          onPress={toggleDarkMode}
           accessibilityRole="switch"
         >
           <Ionicons
@@ -77,52 +78,57 @@ export default function LoginScreen() {
         >
           {/* Top Brand */}
           <View style={styles.topContainer}>
-            <Text
-              style={[
-                styles.brand,
-                { color: darkMode ? "#FFD700" : "#FFB700 " },
-              ]}
-            >
+            <Text style={[styles.brand, { color: theme.primary }]}>
               RemindME
             </Text>
-            <Text style={[styles.subtitle, { color: labelColor }]}>
+            <Text style={[styles.subtitle, { color: theme.text }]}>
               Your accessible reminder companion
             </Text>
           </View>
 
           {/* Card */}
-          <View style={[styles.card, { backgroundColor: cardBg }]}>
-            <Text style={[styles.welcome, { color: gradientColors[0] }]}>
+          <View
+            style={[styles.card, { backgroundColor: theme.cardBackground }]}
+          >
+            <Text style={[styles.welcome, { color: theme.text }]}>
               Welcome Back
             </Text>
 
             {/* Parent ID Input */}
-            <Text style={styles.label}>Parent ID</Text>
+            <Text style={[styles.label, { color: theme.text }]}>Parent ID</Text>
             <TextInput
               style={[
                 styles.input,
-                { backgroundColor: inputBg, color: inputColor },
+                {
+                  backgroundColor: theme.inputBackground,
+                  color: theme.text,
+                  borderColor: theme.inputBorder,
+                },
               ]}
               value={parentId}
               onChangeText={setParentId}
               placeholder="Enter your Parent ID"
-              placeholderTextColor="#999"
+              placeholderTextColor={darkMode ? "#95badf" : "#999"}
               autoCapitalize="none"
               keyboardType="default"
               accessibilityLabel="Parent ID input"
             />
 
             {/* Password Input */}
-            <Text style={[styles.label, { color: labelColor }]}>Password</Text>
+            <Text style={[styles.label, { color: theme.text }]}>Password</Text>
             <TextInput
               style={[
                 styles.input,
-                { backgroundColor: inputBg, color: inputColor },
+                {
+                  backgroundColor: theme.inputBackground,
+                  color: theme.text,
+                  borderColor: theme.inputBorder,
+                },
               ]}
               value={password}
               onChangeText={setPassword}
               placeholder="Enter your password"
-              placeholderTextColor="#999"
+              placeholderTextColor={darkMode ? "#95badf" : "#999"}
               secureTextEntry
               autoCapitalize="none"
             />
@@ -149,11 +155,11 @@ export default function LoginScreen() {
             />
 
             {/* Footer */}
-            <Text style={[styles.footerText, { color: labelColor }]}>
+            <Text style={[styles.footerText, { color: theme.text }]}>
               No Account?
             </Text>
             <TouchableOpacity onPress={() => router.push("/create-account")}>
-              <Text style={[styles.createAccount, { color: labelColor }]}>
+              <Text style={[styles.createAccount, { color: theme.text }]}>
                 Create Account
               </Text>
             </TouchableOpacity>

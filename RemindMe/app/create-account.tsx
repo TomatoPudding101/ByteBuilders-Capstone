@@ -1,3 +1,5 @@
+import { useTheme } from "./ThemeContext";
+
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -22,26 +24,57 @@ export default function CreateAccount() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const { isDarkMode, theme } = useTheme();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.background }]}
+    >
       {/* App Title */}
-      <Text style={styles.title}>RemindME</Text>
+      <Text style={[styles.title, { color: theme.primary }]}>RemindME</Text>
 
       {/* Subtitle */}
-      <Text style={styles.subtitle}>Your accessible reminder companion</Text>
+      <Text style={[styles.subtitle, { color: theme.text }]}>
+        Your accessible reminder companion
+      </Text>
 
       {/* Card */}
-      <View style={styles.card}>
-        <Text style={styles.title}>Create Account</Text>
+      <View
+        style={[
+          styles.card,
+          {
+            backgroundColor: isDarkMode
+              ? "rgba(55,65,81,0.9)"
+              : "rgba(255,255,255,0.6) ",
+          },
+        ]}
+      >
+        <Text style={[styles.title, { color: theme.text }]}>
+          Create Account
+        </Text>
+
+        <TextInput style={[styles.input, { color: theme.text }]} />
+
+        <Text style={[styles.label, { color: theme.textSecondary }]}></Text>
 
         {/* Parent ID */}
         <View style={styles.field}>
-          <Text style={styles.label}>Parent ID</Text>
-          <View style={styles.inputContainer}>
+          <Text style={[styles.label, { color: theme.textSecondary }]}>
+            Parent ID
+          </Text>
+          <View
+            style={[
+              styles.inputContainer,
+              {
+                backgroundColor: theme.inputBackground,
+                borderColor: theme.inputBorder,
+                borderWidth: 1,
+              },
+            ]}
+          >
             <Image source={PersonIcon} style={styles.icon} />
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: theme.text }]}
               placeholder="Enter your Parent ID"
               value={parentId}
               onChangeText={setParentId}
@@ -51,11 +84,22 @@ export default function CreateAccount() {
 
         {/* Password */}
         <View style={styles.field}>
-          <Text style={styles.label}>Password</Text>
-          <View style={styles.inputContainer}>
+          <Text style={[styles.label, { color: theme.textSecondary }]}>
+            Password
+          </Text>
+          <View
+            style={[
+              styles.inputContainer,
+              {
+                backgroundColor: theme.inputBackground,
+                borderColor: theme.inputBorder,
+                borderWidth: 1,
+              },
+            ]}
+          >
             <Image source={LockIcon} style={styles.icon} />
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: theme.text }]}
               placeholder="Enter your password"
               secureTextEntry={!showPassword}
               value={password}
@@ -69,11 +113,22 @@ export default function CreateAccount() {
 
         {/* Confirm Password */}
         <View style={styles.field}>
-          <Text style={styles.labelLight}>Confirm Password</Text>
-          <View style={styles.inputContainer}>
+          <Text style={[styles.label, { color: theme.textSecondary }]}>
+            Confirm Password
+          </Text>
+          <View
+            style={[
+              styles.inputContainer,
+              {
+                backgroundColor: theme.inputBackground,
+                borderColor: theme.inputBorder,
+                borderWidth: 1,
+              },
+            ]}
+          >
             <Image source={LockIcon2} style={styles.icon} />
             <TextInput
-              style={styles.input}
+              style={[styles.input, { color: theme.text }]}
               placeholder="Confirm your password"
               secureTextEntry={!showPassword}
               value={confirmPassword}
@@ -99,12 +154,16 @@ export default function CreateAccount() {
         </TouchableOpacity>
 
         {/* Divider */}
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: theme.border }]} />
 
         {/* Footer */}
-        <Text style={styles.remember}>Remember Password</Text>
+        <Text style={[styles.remember, { color: theme.textSecondary }]}>
+          Remember Password
+        </Text>
         <TouchableOpacity onPress={() => router.push("/login")}>
-          <Text style={styles.login}>Login</Text>
+          <Text style={[styles.login, { color: theme.textSecondary }]}>
+            Login
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -178,7 +237,6 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
     borderRadius: 8,
     paddingHorizontal: 12,
     height: 44,

@@ -1,6 +1,7 @@
 import { useTheme } from "./ThemeContext";
 
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -29,6 +30,15 @@ const AdultSettings = () => {
       edges={["top", "left", "right"]}
     >
       <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+
+      <LinearGradient
+        colors={
+          isDarkMode
+            ? ["#1f2937", "#1f2937"]
+            : ["#fff0f0", "#f0f4ff", "#f0fff4"]
+        }
+        style={StyleSheet.absoluteFill}
+      />
 
       {/* Heading */}
       <View style={styles.header}>
@@ -350,7 +360,10 @@ const AdultSettings = () => {
             color="#EF4444"
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/progressjourney")}
+        >
           <Ionicons name="checkmark-circle-outline" size={28} color="#F59E0B" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>

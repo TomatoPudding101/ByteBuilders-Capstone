@@ -1,9 +1,9 @@
 import { useTheme } from "./ThemeContext";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  Keyboard,
   Modal,
+  Platform,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -15,8 +15,18 @@ import {
 } from "react-native";
 
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+let persistentReminders: {
+  title: string;
+  time: string;
+  notes: string;
+  completed: boolean;
+}[] = [];
 
 const AdultDashboard = () => {
   const router = useRouter();
@@ -24,20 +34,73 @@ const AdultDashboard = () => {
 
   const [isReminderModalVisible, setIsReminderModalVisible] = useState(false);
   const [reminderTitle, setReminderTitle] = useState("");
-  const [reminderTime, setReminderTime] = useState("");
+  const [reminderTime, setReminderTime] = useState<Date>(new Date());
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [reminderNotes, setReminderNotes] = useState("");
 
-  const handleCreateReminder = () => {
-    console.log("Reminder created:", {
-      reminderTitle,
-      reminderTime,
-      reminderNotes,
-    });
+  const [reminderList, setReminders] = useState(persistentReminders);
 
+  useEffect(() => {
+    AsyncStorage.getItem("reminders").then((saved) => {
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        persistentReminders = parsed;
+        setReminders(parsed);
+      }
+    });
+  }, []);
+
+  const updateReminders = (
+    updater: (prev: typeof persistentReminders) => typeof persistentReminders,
+  ) => {
+    setReminders((prev) => {
+      const next = updater(prev);
+      persistentReminders = next;
+      return next;
+    });
+  };
+
+  const saveReminders = async (reminders: typeof persistentReminders) => {
+    try {
+      await AsyncStorage.setItem("reminders", JSON.stringify(reminders));
+    } catch (e) {
+      console.error("Error saving reminders", e);
+    }
+  };
+
+  const handleCreateReminder = () => {
+    if (!reminderTitle.trim()) return;
+    const newList = [
+      ...persistentReminders,
+      {
+        title: reminderTitle,
+        time: reminderTime.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        notes: reminderNotes,
+        completed: false,
+      },
+    ];
+
+    updateReminders(() => newList);
+    saveReminders(newList);
     setReminderTitle("");
-    setReminderTime("");
+    setReminderTime(new Date());
     setReminderNotes("");
     setIsReminderModalVisible(false);
+  };
+
+  const handleCompleteReminder = (index: number) => {
+    updateReminders((prev) =>
+      prev.map((r, i) => (i === index ? { ...r, completed: !r.completed } : r)),
+    );
+    saveReminders(persistentReminders);
+  };
+
+  const handleDeleteReminder = (index: number) => {
+    updateReminders((prev) => prev.filter((_, i) => i !== index));
+    saveReminders(persistentReminders);
   };
 
   return (
@@ -46,6 +109,15 @@ const AdultDashboard = () => {
       edges={["top", "left", "right"]}
     >
       <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+
+      <LinearGradient
+        colors={
+          isDarkMode
+            ? ["#1f2937", "#1f2937"]
+            : ["#fff0f0", "#f0f4ff", "#f0fff4"]
+        }
+        style={StyleSheet.absoluteFill}
+      />
 
       {/* Header */}
       <View style={styles.header}>
@@ -67,7 +139,7 @@ const AdultDashboard = () => {
             { backgroundColor: theme.cardBackground },
           ]}
         >
-          <Text style={styles.statNumber}>0</Text>
+          <Text style={styles.statNumber}>{reminderList.length}</Text>
           <Text style={styles.statLabel}>Total Reminders</Text>
         </View>
         <View
@@ -77,7 +149,9 @@ const AdultDashboard = () => {
             { backgroundColor: theme.cardBackground },
           ]}
         >
-          <Text style={[styles.statNumber, styles.statNumberOrange]}>0</Text>
+          <Text style={[styles.statNumber, styles.statNumberOrange]}>
+            {reminderList.length}
+          </Text>
           <Text style={styles.statLabel}>Todays Tasks</Text>
         </View>
       </View>
@@ -90,7 +164,9 @@ const AdultDashboard = () => {
             { backgroundColor: theme.cardBackground },
           ]}
         >
-          <Text style={[styles.statNumber, styles.statNumberCyan]}>0</Text>
+          <Text style={[styles.statNumber, styles.statNumberCyan]}>
+            {reminderList.filter((r) => r.completed).length}
+          </Text>
           <Text style={styles.statLabel}>Completed Today</Text>
         </View>
         <View
@@ -100,7 +176,15 @@ const AdultDashboard = () => {
             { backgroundColor: theme.cardBackground },
           ]}
         >
-          <Text style={[styles.statNumber, styles.statNumberPurple]}>0%</Text>
+          <Text style={[styles.statNumber, styles.statNumberPurple]}>
+            {reminderList.length === 0
+              ? "0%"
+              : Math.round(
+                  (reminderList.filter((r) => r.completed).length /
+                    reminderList.length) *
+                    100,
+                ) + "%"}
+          </Text>
           <Text style={styles.statLabel}>Progress</Text>
         </View>
       </View>
@@ -113,6 +197,36 @@ const AdultDashboard = () => {
         <TouchableOpacity style={styles.actionIcon}>
           <Ionicons name="notifications-outline" size={24} color="#666" />
         </TouchableOpacity>
+
+        {reminderList.length >= 2 && (
+          <View
+            style={{
+              backgroundColor: isDarkMode ? theme.cardBackground : "#9333EA",
+              borderRadius: 12,
+              padding: 8,
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => setIsReminderModalVisible(true)}
+              style={{
+                backgroundColor: "#933ea",
+                paddingVertical: 8,
+                paddingHorizontal: 16,
+                borderRadius: 10,
+              }}
+            >
+              <Text
+                style={{
+                  color: isDarkMode ? theme.text : "white",
+                  fontSize: 13,
+                  fontWeight: "600",
+                }}
+              >
+                + Add Reminder
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
       {/* Your Reminders Section */}
@@ -121,19 +235,121 @@ const AdultDashboard = () => {
         <Text style={styles.remindersHeaderText}>Your Reminders</Text>
       </TouchableOpacity>
 
-      {/* Empty State} */}
-      <View style={styles.emptyState}>
-        <Ionicons name="calendar-outline" size={60} color="#D1D5DB" />
-        <Text style={styles.emptyStateText}>No reminders yet</Text>
-        <TouchableOpacity
-          style={styles.createReminderButton}
-          onPress={() => setIsReminderModalVisible(true)}
-        >
-          <Text style={styles.createReminderButtonText}>
-            + Add Your First Reminder
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <ScrollView style={{ flex: 1, paddingHorizontal: 20 }}>
+        {reminderList.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Ionicons name="calendar-outline" size={60} color="#D1D5DB" />
+            <Text style={styles.emptyStateText}>No reminders yet</Text>
+          </View>
+        ) : (
+          reminderList.map((reminderList, index) => (
+            <View
+              key={index}
+              style={[
+                styles.statCard,
+                {
+                  backgroundColor: theme.cardBackground,
+                  alignItems: "flex-start",
+                  marginBottom: 12,
+                  opacity: reminderList.completed ? 0.6 : 1,
+                },
+              ]}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: "600",
+                    color: theme.text,
+                    textDecorationLine: reminderList.completed
+                      ? "line-through"
+                      : "none",
+                    flex: 1,
+                  }}
+                >
+                  {reminderList.title}
+                </Text>
+
+                <TouchableOpacity
+                  onPress={() => handleDeleteReminder(index)}
+                  style={{ marginLeft: 8 }}
+                >
+                  <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                </TouchableOpacity>
+              </View>
+              {reminderList.time ? (
+                <Text
+                  style={{
+                    fontSize: 13,
+                    color: theme.text,
+                    marginTop: 4,
+                  }}
+                >
+                  ⏰ {reminderList.time}
+                </Text>
+              ) : null}
+              {reminderList.notes ? (
+                <Text style={{ fontSize: 13, color: "#999", marginTop: 4 }}>
+                  {reminderList.notes}
+                </Text>
+              ) : null}
+
+              <TouchableOpacity
+                onPress={() => handleCompleteReminder(index)}
+                style={{
+                  marginTop: 10,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 6,
+                  backgroundColor: reminderList.completed
+                    ? "#D1FAE5"
+                    : "#F3F4F6",
+                  paddingVertical: 6,
+                  paddingHorizontal: 12,
+                  borderRadius: 8,
+                }}
+              >
+                <Ionicons
+                  name={
+                    reminderList.completed
+                      ? "checkmark-circle"
+                      : "checkmark-circle-outline"
+                  }
+                  size={18}
+                  color={reminderList.completed ? "#10B981" : "#9CA3AF"}
+                />
+                <Text
+                  style={{
+                    fontSize: 13,
+                    fontWeight: "600",
+                    color: reminderList.completed ? "#10b981" : theme.primary,
+                  }}
+                >
+                  {reminderList.completed ? "Completed" : "Mark Complete"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ))
+        )}
+        {reminderList.length < 2 && (
+          <TouchableOpacity
+            style={[
+              styles.createReminderButton,
+              { marginBottom: 20, alignSelf: "center" },
+            ]}
+            onPress={() => setIsReminderModalVisible(true)}
+          >
+            <Text style={styles.createReminderButtonText}>+ Add Reminder</Text>
+          </TouchableOpacity>
+        )}
+      </ScrollView>
 
       {/* Reminder Modal */}
       <Modal
@@ -147,7 +363,7 @@ const AdultDashboard = () => {
           activeOpacity={1}
           onPress={() => setIsReminderModalVisible(false)}
         >
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
             <View
               style={[
                 styles.modalContent,
@@ -200,20 +416,104 @@ const AdultDashboard = () => {
                   <Text style={[styles.statLabel, { color: theme.text }]}>
                     Time
                   </Text>
-                  <TextInput
+                  <TouchableOpacity
+                    onPress={() => setShowTimePicker(!showTimePicker)}
                     style={[
                       styles.input,
                       {
                         backgroundColor: theme.inputBackground,
                         borderColor: theme.inputBorder,
-                        color: theme.text,
+                        justifyContent: "center",
                       },
                     ]}
-                    value={reminderTime}
-                    onChangeText={setReminderTime}
-                    placeholder="e.g., 12:00 AM"
-                    placeholderTextColor={theme.textTertiary}
-                  />
+                  >
+                    <Text style={{ color: theme.text, fontSize: 15 }}>
+                      {reminderTime.toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </Text>
+                  </TouchableOpacity>
+                  {showTimePicker && (
+                    <View
+                      style={{
+                        backgroundColor: "#1f2937",
+                        borderRadius: 10,
+                        overflow: "hidden",
+                        marginTop: 10,
+                        marginBottom: 2,
+                      }}
+                    >
+                      {Platform.OS === "web" ? (
+                        <input
+                          type="time"
+                          style={{
+                            width: "100%",
+                            padding: "12px",
+                            fontSize: "16px",
+                            backgroundColor: "#1f2937",
+                            color: "#ffffff",
+                            border: "none",
+                            outline: "none",
+                            cursor: "pointer",
+                          }}
+                          defaultValue={reminderTime.toLocaleTimeString(
+                            "en-GB",
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            },
+                          )}
+                          onBlur={(e) => {
+                            const val = e.target.value;
+                            if (!val) return;
+                            const [hours, minutes] = val.split(":");
+                            const h = parseInt(hours);
+                            const m = parseInt(minutes);
+                            if (isNaN(h) || isNaN(m)) return;
+                            const newTime = new Date();
+                            newTime.setHours(h);
+                            newTime.setMinutes(m);
+                            newTime.setSeconds(0);
+                            setReminderTime(newTime);
+                          }}
+                        />
+                      ) : (
+                        <DateTimePicker
+                          value={reminderTime}
+                          mode="time"
+                          display="spinner"
+                          style={{ height: 120 }}
+                          textColor="#ffffff"
+                          onChange={(event, selectedTime) => {
+                            if (selectedTime) setReminderTime(selectedTime);
+                          }}
+                        />
+                      )}
+                      <TouchableOpacity
+                        onPress={() => setShowTimePicker(false)}
+                        style={{
+                          backgroundColor: "#9333ea",
+                          paddingVertical: 10,
+                          borderRadius: 8,
+                          alignItems: "center",
+                          marginTop: 8,
+                          marginHorizontal: 10,
+                          marginBottom: 10,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#FFF",
+                            fontWeight: "600",
+                            fontSize: 15,
+                          }}
+                        >
+                          Confirm Time
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
                 </View>
 
                 <View style={styles.inputGroup}>
@@ -227,6 +527,8 @@ const AdultDashboard = () => {
                         backgroundColor: theme.inputBackground,
                         borderColor: theme.inputBorder,
                         color: theme.text,
+                        height: 100,
+                        paddingTop: 10,
                       },
                     ]}
                     value={reminderNotes}
@@ -272,14 +574,20 @@ const AdultDashboard = () => {
           },
         ]}
       >
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/adultDashboard")}
+        >
           <MaterialCommunityIcons
             name="chart-box-outline"
             size={28}
             color="#EF4444"
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/progressjourney")}
+        >
           <Ionicons name="checkmark-circle-outline" size={28} color="#F59E0B" />
         </TouchableOpacity>
         <TouchableOpacity
@@ -448,7 +756,7 @@ const styles = StyleSheet.create({
   modalContent: {
     width: "100%",
     maxWidth: 400,
-    maxHeight: "70%",
+    maxHeight: "90%",
     borderRadius: 20,
     padding: 20,
     shadowColor: "#000",
@@ -488,7 +796,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: "600",
-    marginBottom: 12,
+    marginBottom: 10,
   },
 
   input: {
@@ -512,11 +820,11 @@ const styles = StyleSheet.create({
   },
 
   modalButton: {
-    flex: 1,
     paddingVertical: 14,
-    paddingHorizontal: 40,
+    paddingHorizontal: 45,
     borderRadius: 10,
     alignItems: "center",
+    marginTop: 10,
   },
 
   cancelButton: {

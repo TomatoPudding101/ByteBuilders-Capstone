@@ -20,6 +20,7 @@ export default function RootLayout() {
         <Stack.Screen name="login" />
         <Stack.Screen name="adultDashboard" options={{ headerShown: false }} />
         <Stack.Screen name="adultSettings" options={{ headerShown: false }} />
+        <Stack.Screen name="progressjourney" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
