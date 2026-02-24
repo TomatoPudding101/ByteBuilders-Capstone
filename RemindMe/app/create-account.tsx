@@ -22,6 +22,12 @@ export default function CreateAccount() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  
+  const handleSignUp = () => {
+    console.log("Signing up with", parentId, password, confirmPassword);
+    router.push("/adultDashboard");
+    // Example: navigation.replace?.('MainTabs');
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -83,7 +89,11 @@ export default function CreateAccount() {
         </View>
 
         {/* Sign Up Button */}
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleSignUp}
+          activeOpacity={0.85}
+          style={{ marginTop: 10 }}
+        >
           <LinearGradient
             colors={[
               "rgba(46, 33, 229, 0.84)",
@@ -122,7 +132,6 @@ const styles = StyleSheet.create({
     marginTop: 40,
     color: "#FFB700",
     fontSize: 32,
-    fontFamily: "SF Pro",
     fontWeight: "400",
   },
 
@@ -130,7 +139,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     color: "#757575",
     fontSize: 16,
-    fontFamily: "SF Pro Rounded",
   },
 
   icon: {
@@ -151,7 +159,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "rgba(203, 94, 126, 0.84)",
     fontSize: 32,
-    fontFamily: "SF Pro",
     marginBottom: 20,
   },
 
@@ -162,7 +169,6 @@ const styles = StyleSheet.create({
   label: {
     color: "#757575",
     fontSize: 14,
-    fontFamily: "SF Compact",
     fontWeight: "600",
     marginBottom: 6,
   },
@@ -170,7 +176,6 @@ const styles = StyleSheet.create({
   labelLight: {
     color: "#757575",
     fontSize: 14,
-    fontFamily: "SF Compact",
     fontWeight: "400",
     marginBottom: 6,
   },
@@ -201,7 +206,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#F5F5F5",
     fontSize: 16,
-    fontFamily: "SF Pro",
     fontWeight: "700",
   },
 
@@ -215,7 +219,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#757575",
     fontSize: 16,
-    fontFamily: "SF Pro Rounded",
   },
 
   login: {
@@ -223,7 +226,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
     color: "#757575",
     fontSize: 12,
-    fontFamily: "SF Compact",
     fontWeight: "600",
   },
 });
