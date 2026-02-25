@@ -1,4 +1,7 @@
+import { useTheme } from "./ThemeContext";
+
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -14,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const AdultSettings = () => {
   const router = useRouter();
+  const { isDarkMode, toggleDarkMode, theme } = useTheme();
   const [activeTab, setActiveTab] = useState<
     "profile" | "preferences" | "accessibility"
   >("profile");
@@ -21,8 +25,20 @@ const AdultSettings = () => {
   const [emailAddress, setEmailAddress] = useState("");
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
-      <StatusBar barStyle="dark-content" />
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.background }]}
+      edges={["top", "left", "right"]}
+    >
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+
+      <LinearGradient
+        colors={
+          isDarkMode
+            ? ["#1f2937", "#1f2937"]
+            : ["#fff0f0", "#f0f4ff", "#f0fff4"]
+        }
+        style={StyleSheet.absoluteFill}
+      />
 
       {/* Heading */}
       <View style={styles.header}>
@@ -31,20 +47,36 @@ const AdultSettings = () => {
           onPress={() => router.push("/adultDashboard")}
         >
           <Ionicons name="arrow-back" size={24} color="#9333EA" />
-          <Text style={styles.backText}>Back to Dashboard</Text>
+          <Text
+            style={[
+              styles.backText,
+              { backgroundColor: theme.background, color: theme.text },
+            ]}
+          >
+            Back to Dashboard
+          </Text>
         </TouchableOpacity>
       </View>
 
       {/* Title */}
       <View style={styles.titleContainer}>
-        <Text style={styles.settingsLabel}>settings</Text>
+        <Text style={[styles.settingsLabel, { color: theme.text }]}>
+          settings
+        </Text>
         <Text style={styles.pageTitle}>Account Settings</Text>
       </View>
 
       {/* Tabs */}
       <View style={styles.tabContainer}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === "profile" && styles.tabActive]}
+          style={[
+            styles.tab,
+            activeTab === "profile" && styles.tabActive,
+            {
+              backgroundColor: theme.cardBackground,
+              borderColor: theme.border,
+            },
+          ]}
           onPress={() => setActiveTab("profile")}
         >
           <Ionicons
@@ -56,6 +88,7 @@ const AdultSettings = () => {
             style={[
               styles.tabText,
               activeTab === "profile" && styles.tabTextActive,
+              { color: theme.text },
             ]}
           >
             Profile
@@ -63,7 +96,14 @@ const AdultSettings = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.tab, activeTab === "preferences" && styles.tabActive]}
+          style={[
+            styles.tab,
+            activeTab === "preferences" && styles.tabActive,
+            {
+              backgroundColor: theme.cardBackground,
+              borderColor: theme.border,
+            },
+          ]}
           onPress={() => setActiveTab("preferences")}
         >
           <Ionicons
@@ -75,6 +115,7 @@ const AdultSettings = () => {
             style={[
               styles.tabText,
               activeTab === "preferences" && styles.tabTextActive,
+              { color: theme.text },
             ]}
           >
             Preferences
@@ -85,6 +126,10 @@ const AdultSettings = () => {
           style={[
             styles.tab,
             activeTab === "accessibility" && styles.tabActive,
+            {
+              backgroundColor: theme.cardBackground,
+              borderColor: theme.border,
+            },
           ]}
           onPress={() => setActiveTab("accessibility")}
         >
@@ -97,6 +142,7 @@ const AdultSettings = () => {
             style={[
               styles.tabText,
               activeTab === "accessibility" && styles.tabTextActive,
+              { color: theme.text },
             ]}
           >
             Accessibility
@@ -105,59 +151,205 @@ const AdultSettings = () => {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Profile Information */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>Profile Information</Text>
-            <TouchableOpacity style={styles.editButton}>
-              <Text style={styles.editButtonText}>Edit Profile</Text>
-            </TouchableOpacity>
-          </View>
+        {activeTab === "profile" && (
+          <>
+            {/* Profile Information */}
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: theme.cardBackground,
+                  borderColor: theme.inputBorder,
+                },
+              ]}
+            >
+              <View style={styles.cardHeader}>
+                <Text style={[styles.cardTitle, { color: theme.text }]}>
+                  Profile Information
+                </Text>
+                <TouchableOpacity style={styles.editButton}>
+                  <Text style={styles.editButtonText}>Edit Profile</Text>
+                </TouchableOpacity>
+              </View>
 
-          <Text style={styles.cardSubtitle}>Update your personal details</Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Update your personal details
+              </Text>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Full Name</Text>
-            <TextInput
-              style={styles.input}
-              value={fullName}
-              onChangeText={setFullName}
-              placeholder="Enter your full name"
-              placeholderTextColor="#999"
-            />
-          </View>
+              <View style={styles.inputGroup}>
+                <Text style={[styles.label, { color: theme.text }]}>
+                  Full Name
+                </Text>
+                <TextInput
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: theme.inputBackground,
+                      borderColor: theme.border,
+                    },
+                  ]}
+                  value={fullName}
+                  onChangeText={setFullName}
+                  placeholder="Enter your full name"
+                  placeholderTextColor="#95badf"
+                />
+              </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email Address</Text>
-            <TextInput
-              style={styles.input}
-              value={emailAddress}
-              onChangeText={setEmailAddress}
-              placeholder="Enter your email address"
-              placeholderTextColor="#999"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-        </View>
+              <View style={styles.inputGroup}>
+                <Text style={[styles.label, { color: theme.text }]}>
+                  Email Address
+                </Text>
+                <TextInput
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: theme.inputBackground,
+                      borderColor: theme.border,
+                    },
+                  ]}
+                  value={emailAddress}
+                  onChangeText={setEmailAddress}
+                  placeholder="Enter your email address"
+                  placeholderTextColor="#95badf"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
+            </View>
 
-        {/* Account Actions */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Account Actions</Text>
+            {/* Account Actions */}
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                Account Actions
+              </Text>
 
-          <TouchableOpacity
-            style={styles.signOutButton}
-            onPress={() => router.push("/login")}
-          >
-            <Text style={styles.signOutText}>Sign Out</Text>
-          </TouchableOpacity>
-        </View>
+              <TouchableOpacity
+                style={[
+                  styles.signOutButton,
+                  {
+                    backgroundColor: theme.inputBackground,
+                    borderColor: theme.inputBorder,
+                  },
+                ]}
+                onPress={() => router.push("/login")}
+              >
+                <Text style={[styles.signOutText, { color: theme.text }]}>
+                  Sign Out
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+
+        {activeTab === "preferences" && (
+          <>
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                Notification Preferences
+              </Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Manage notification settings
+              </Text>
+
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Coming soon...
+              </Text>
+            </View>
+
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                App Preferences
+              </Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Customize your app experience
+              </Text>
+
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Coming soon...
+              </Text>
+            </View>
+          </>
+        )}
+
+        {activeTab === "accessibility" && (
+          <>
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                Accessibility Options
+              </Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Customize accessibility features
+              </Text>
+
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Coming soon...
+              </Text>
+            </View>
+
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                Display Settings
+              </Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Adjust text size and contrast
+              </Text>
+
+              <View style={[styles.settingRow, { borderColor: theme.border }]}>
+                <View style={styles.settingInfo}>
+                  <Text style={[styles.label, { color: theme.text }]}>
+                    Dark Mode
+                  </Text>
+                  <Text
+                    style={[
+                      styles.settingDescription,
+                      { color: theme.textTertiary },
+                    ]}
+                  >
+                    Enable dark theme
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={[
+                    styles.toggleButton,
+                    isDarkMode && styles.toggleButtonActive,
+                  ]}
+                  onPress={toggleDarkMode}
+                >
+                  <View
+                    style={[
+                      styles.toggleCircle,
+                      isDarkMode && styles.toggleCircleActive,
+                    ]}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>
+        )}
 
         <View style={{ height: 100 }} />
       </ScrollView>
 
       {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
+      <View
+        style={[
+          styles.bottomNav,
+          {
+            backgroundColor: theme.cardBackground,
+            borderTopColor: theme.border,
+          },
+        ]}
+      >
         <TouchableOpacity
           style={styles.navItem}
           onPress={() => router.push("/adultDashboard")}
@@ -168,7 +360,10 @@ const AdultSettings = () => {
             color="#EF4444"
           />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/progressjourney")}
+        >
           <Ionicons name="checkmark-circle-outline" size={28} color="#F59E0B" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
@@ -359,6 +554,54 @@ const styles = StyleSheet.create({
 
   navItem: {
     padding: 8,
+  },
+
+  settingRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#F3F4F6",
+    marginTop: 12,
+  },
+
+  settingInfo: {
+    flex: 1,
+  },
+
+  settingDescription: {
+    fontSize: 12,
+    marginTop: 4,
+  },
+
+  toggleButton: {
+    width: 51,
+    height: 31,
+    borderRadius: 16,
+    backgroundColor: "#D1D5DB",
+    padding: 2,
+    justifyContent: "center",
+  },
+
+  toggleButtonActive: {
+    backgroundColor: "#9333EA",
+  },
+
+  toggleCircle: {
+    width: 27,
+    height: 27,
+    borderRadius: 14,
+    backgroundColor: "#FFF",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+
+  toggleCircleActive: {
+    transform: [{ translateX: 20 }],
   },
 });
 
