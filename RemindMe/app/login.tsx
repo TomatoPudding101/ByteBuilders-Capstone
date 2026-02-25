@@ -1,6 +1,5 @@
 import { useTheme } from "./ThemeContext";
 
-import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -59,18 +58,6 @@ export default function LoginScreen() {
         style={[styles.bg, { backgroundColor: theme.background }]}
         resizeMode="cover"
       >
-        {/* Moon/Sun toggle top right */}
-        <TouchableOpacity
-          style={styles.iconToggle}
-          onPress={toggleDarkMode}
-          accessibilityRole="switch"
-        >
-          <Ionicons
-            name={darkMode ? "moon" : "sunny"}
-            size={28}
-            color={darkMode ? "#fff" : "#000"}
-          />
-        </TouchableOpacity>
 
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
@@ -199,12 +186,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     width: Math.min(272, width * 0.9),
     marginTop: 6,
-  },
-  iconToggle: {
-    position: "absolute",
-    top: Platform.OS === "android" ? 40 : 64,
-    right: 16,
-    zIndex: 10,
   },
   card: {
     width: "86%",
