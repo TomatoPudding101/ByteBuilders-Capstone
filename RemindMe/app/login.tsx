@@ -24,7 +24,7 @@ export default function LoginScreen() {
   const [parentId, setParentId] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const { isDarkMode: darkMode, toggleDarkMode, theme } = useTheme();
+  const { isDarkMode: darkMode, theme } = useTheme();
 
   const handleSignIn = () => {
     console.log("Signing in with", parentId, password);
@@ -58,7 +58,6 @@ export default function LoginScreen() {
         style={[styles.bg, { backgroundColor: theme.background }]}
         resizeMode="cover"
       >
-
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
