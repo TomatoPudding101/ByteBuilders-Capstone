@@ -2,6 +2,7 @@ import { useTheme } from "./ThemeContext";
 
 import { useEffect, useState } from "react";
 import {
+  Alert,
   Modal,
   Platform,
   ScrollView,
@@ -92,10 +93,46 @@ const AdultDashboard = () => {
   };
 
   const handleCompleteReminder = (index: number) => {
+    const wasCompleted = persistentReminders[index].completed;
     updateReminders((prev) =>
       prev.map((r, i) => (i === index ? { ...r, completed: !r.completed } : r)),
     );
     saveReminders(persistentReminders);
+
+    AsyncStorage.getItem("progressStats").then((saved) => {
+      const stats = saved
+        ? JSON.parse(saved)
+        : {
+            completed: 0,
+            streak: 0,
+            activeDays: 0,
+            missedDays: 0,
+            lastCompletedDate: null,
+          };
+
+      if (!wasCompleted) {
+        stats.completed += 1;
+        stats.activeDays += 1;
+
+        const today = new Date().toDateString();
+        if (stats.lastCompletedDate === today) {
+        } else {
+          stats.streak += 1;
+          stats.lastCompletedDate = today;
+        }
+      } else {
+        stats.completed = Math.max(0, stats.completed - 1);
+      }
+
+      AsyncStorage.setItem("progressStats", JSON.stringify(stats));
+
+      if (!wasCompleted && stats.streak >= 2) {
+        Alert.alert(
+          "🔥 You're on a streak!",
+          `${stats.streak} days in a row! Keep it up!`,
+        );
+      }
+    });
   };
 
   const handleDeleteReminder = (index: number) => {

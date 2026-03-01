@@ -22,7 +22,7 @@ export default function CreateAccount() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  
+
   const handleSignUp = () => {
     console.log("Signing up with", parentId, password, confirmPassword);
     router.push("/adultDashboard");
@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "rgba(255, 255, 255, 0.10)",
     alignItems: "center",
+    justifyContent: "center",
   },
 
   appTitle: {

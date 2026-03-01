@@ -182,6 +182,8 @@ const styles = StyleSheet.create({
   scrollContainer: {
     alignItems: "center",
     paddingBottom: 48,
+    flexGrow: 1,
+    justifyContent: "center",
   },
   topContainer: {
     alignItems: "center",

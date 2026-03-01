@@ -17,7 +17,8 @@ export default function RootLayout() {
           options={{ presentation: "modal", title: "Modal" }}
         />
         <Stack.Screen name="index" />
-        <Stack.Screen name="login" />
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="create-account" options={{ headerShown: false }} />
         <Stack.Screen name="adultDashboard" options={{ headerShown: false }} />
         <Stack.Screen name="adultSettings" options={{ headerShown: false }} />
         <Stack.Screen name="progressjourney" options={{ headerShown: false }} />
