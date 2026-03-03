@@ -1,23 +1,23 @@
-import { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const PIN_LENGTH = 5;
 
 const KEY_COLORS: Record<string, string> = {
-  '1': '#e8706a',
-  '2': '#5bbfb0',
-  '3': '#6ab8d4',
-  '4': '#7dc9b8',
-  '5': '#d4c040',
-  '6': '#d4a0c8',
-  '7': '#88b0d8',
-  '8': '#6040c0',
-  '9': '#40d4c8',
-  '0': '#e080a8',
-  '⌫': '#a09090',
-  '✓': '#909090',
+  "1": "#e8706a",
+  "2": "#5bbfb0",
+  "3": "#6ab8d4",
+  "4": "#7dc9b8",
+  "5": "#d4c040",
+  "6": "#d4a0c8",
+  "7": "#88b0d8",
+  "8": "#6040c0",
+  "9": "#40d4c8",
+  "0": "#e080a8",
+  "⌫": "#a09090",
+  "✓": "#909090",
 };
 
 export default function KidsLogin() {
@@ -25,9 +25,9 @@ export default function KidsLogin() {
   const router = useRouter();
 
   const handleKey = (key: string) => {
-    if (key === '⌫') {
+    if (key === "⌫") {
       setPin((prev) => prev.slice(0, -1));
-    } else if (key === '✓') {
+    } else if (key === "✓") {
       // confirm / submit
     } else if (pin.length < PIN_LENGTH) {
       setPin((prev) => [...prev, key]);
@@ -36,15 +36,15 @@ export default function KidsLogin() {
 
   const handleLetsGo = () => {
     if (pin.length === PIN_LENGTH) {
-      router.push('/home');
+      router.push("./kidshome");
     } else {
-      Alert.alert('Enter your full 5-digit PIN');
+      Alert.alert("Enter your full 5-digit PIN");
     }
   };
 
   return (
     <LinearGradient
-      colors={['#fde8d0', '#f8c8d4', '#d4c8f0', '#c8e0f0']}
+      colors={["#fde8d0", "#f8c8d4", "#d4c8f0", "#c8e0f0"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.container}
@@ -64,7 +64,12 @@ export default function KidsLogin() {
 
       {/* Number Pad */}
       <View style={styles.keypad}>
-        {[['1','2','3'],['4','5','6'],['7','8','9'],['⌫','0','✓']].map((row, r) => (
+        {[
+          ["1", "2", "3"],
+          ["4", "5", "6"],
+          ["7", "8", "9"],
+          ["⌫", "0", "✓"],
+        ].map((row, r) => (
           <View key={r} style={styles.keyRow}>
             {row.map((key) => (
               <TouchableOpacity
@@ -81,20 +86,20 @@ export default function KidsLogin() {
 
       {/* Let's Go Button */}
       <TouchableOpacity style={styles.letsGoButton} onPress={handleLetsGo}>
-        <Text style={styles.letsGoText}>Let's Go!</Text>
+        <Text style={styles.letsGoText}>Let`s Go!</Text>
       </TouchableOpacity>
 
-     {/* Forgot Password / New User */}
-     <TouchableOpacity
+      {/* Forgot Password / New User */}
+      <TouchableOpacity
         style={styles.forgotButton}
-        onPress={() => router.push('/forgot-password')}
+        onPress={() => router.push("./kidsforgot-password")}
       >
         <Text style={styles.linkText}>Forgot Password?</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.newUserButton}
-        onPress={() => router.push('/register')}
+        onPress={() => router.push("./kidsregister")}
       >
         <Text style={styles.linkText}>New User?</Text>
       </TouchableOpacity>
@@ -105,26 +110,26 @@ export default function KidsLogin() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: 24,
     gap: 20,
   },
   pinBox: {
-    width: '100%',
-    backgroundColor: '#6a9fd8',
+    width: "100%",
+    backgroundColor: "#6a9fd8",
     borderRadius: 20,
     paddingVertical: 24,
-    alignItems: 'center',
+    alignItems: "center",
     gap: 16,
   },
   pinTitle: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
   },
   pinDots: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
   },
   dot: {
@@ -134,70 +139,70 @@ const styles = StyleSheet.create({
     borderWidth: 3,
   },
   dotEmpty: {
-    borderColor: '#fff',
-    backgroundColor: 'transparent',
+    borderColor: "#fff",
+    backgroundColor: "transparent",
   },
   dotFilled: {
-    borderColor: '#fff',
-    backgroundColor: '#fff',
+    borderColor: "#fff",
+    backgroundColor: "#fff",
   },
   keypad: {
     gap: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   keyRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 16,
   },
   key: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   keyText: {
     fontSize: 26,
-    color: '#fff',
-    fontWeight: '600',
+    color: "#fff",
+    fontWeight: "600",
   },
   letsGoButton: {
-    width: '100%',
-    backgroundColor: '#5cd65c',
+    width: "100%",
+    backgroundColor: "#5cd65c",
     borderRadius: 30,
     paddingVertical: 16,
-    alignItems: 'center',
+    alignItems: "center",
     borderWidth: 2,
-    borderColor: '#3ab83a',
+    borderColor: "#3ab83a",
   },
   letsGoText: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
   },
   forgotButton: {
-    backgroundColor: 'rgba(200,200,200,0.5)',
+    backgroundColor: "rgba(200,200,200,0.5)",
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 32,
-    alignItems: 'center',
+    alignItems: "center",
   },
   newUserButton: {
-    backgroundColor: 'rgba(180,150,200,0.4)',
+    backgroundColor: "rgba(180,150,200,0.4)",
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 32,
-    alignItems: 'center',
+    alignItems: "center",
   },
   linkText: {
     fontSize: 14,
-    color: '#555',
-    textDecorationLine: 'underline',
-    fontWeight: '600',
+    color: "#555",
+    textDecorationLine: "underline",
+    fontWeight: "600",
   },
-  
+
   orText: {
     fontSize: 13,
-    color: '#777',
+    color: "#777",
   },
 });

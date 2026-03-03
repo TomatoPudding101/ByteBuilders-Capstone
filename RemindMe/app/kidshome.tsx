@@ -1,14 +1,19 @@
-import { View, Text, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const MENU_ITEMS = [
-  { label: 'Goals & Habits\nTracker', icon: '🎯', color: '#9b6fd4', route: '/goals' },
-  { label: 'Calendar',               icon: '📅', color: '#5588e0', route: '/calendar' },
-  { label: 'My Progress',            icon: '📈', color: '#3cc470', route: '/progress' },
-  { label: 'Rewards',                icon: '🎖️', color: '#d4a020', route: '/rewards' },
-  { label: 'Focus Timer',            icon: '⏱️', color: '#e040a0', route: '/focus-timer' },
-  { label: 'Settings',               icon: '⚙️', color: '#6655cc', route: '/settings' },
+  {
+    label: "Goals & Habits\nTracker",
+    icon: "🎯",
+    color: "#9b6fd4",
+    route: "/goals",
+  },
+  { label: "Calendar", icon: "📅", color: "#5588e0", route: "/calendar" },
+  { label: "My Progress", icon: "📈", color: "#3cc470", route: "/progress" },
+  { label: "Rewards", icon: "🎖️", color: "#d4a020", route: "/rewards" },
+  { label: "Focus Timer", icon: "⏱️", color: "#e040a0", route: "/focus-timer" },
+  { label: "Settings", icon: "⚙️", color: "#6655cc", route: "/settings" },
 ];
 
 export default function HomePage() {
@@ -16,7 +21,7 @@ export default function HomePage() {
 
   return (
     <LinearGradient
-      colors={['#fde8d0', '#f8c8d4', '#d4c8f0', '#c8e0f0']}
+      colors={["#fde8d0", "#f8c8d4", "#d4c8f0", "#c8e0f0"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.container}
@@ -63,13 +68,13 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   bannerArea: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingTop: 8,
   },
   welcomeText: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     letterSpacing: 3,
   },
   starsDecor: {
@@ -77,29 +82,29 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(255,255,255,0.35)',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "rgba(255,255,255,0.35)",
     borderRadius: 16,
     paddingHorizontal: 20,
     paddingVertical: 10,
   },
   homeTitle: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#222',
+    fontWeight: "bold",
+    color: "#222",
   },
   nameTag: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   nameTagEmoji: {
     fontSize: 32,
   },
   nameTagBox: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderWidth: 2,
-    borderColor: '#5588e0',
+    borderColor: "#5588e0",
     borderRadius: 6,
     paddingHorizontal: 12,
     paddingVertical: 2,
@@ -107,24 +112,24 @@ const styles = StyleSheet.create({
   },
   nameTagLabel: {
     fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
   },
   grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 14,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     paddingBottom: 24,
   },
   tile: {
-    width: '47%',
+    width: "47%",
     aspectRatio: 1,
     borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.18,
     shadowRadius: 8,
@@ -135,9 +140,9 @@ const styles = StyleSheet.create({
   },
   tileLabel: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#fff',
-    textAlign: 'center',
+    fontWeight: "700",
+    color: "#fff",
+    textAlign: "center",
     lineHeight: 18,
   },
 });
