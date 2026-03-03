@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "./ThemeContext";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -58,6 +59,13 @@ export default function LoginScreen() {
         style={[styles.bg, { backgroundColor: theme.background }]}
         resizeMode="cover"
       >
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.push("/")}
+        >
+          <Ionicons name="arrow-back" size={24} color={theme.text} />
+        </TouchableOpacity>
+
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
@@ -246,5 +254,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
     marginTop: 4,
+  },
+  backButton: {
+    position: "absolute",
+    top: Platform.OS === "android" ? 40 : 64,
+    left: 16,
+    zIndex: 10,
+    padding: 8,
   },
 });

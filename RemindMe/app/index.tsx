@@ -1,78 +1,75 @@
-/*
-import { Image } from "expo-image";
-import { Link } from "expo-router";
-import { StyleSheet } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "./ThemeContext";
 
-import ParallaxScrollView from "@/components/parallax-scroll-view";
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
-*/
+export default function SelectVersion() {
+  const router = useRouter();
+  const { theme, isDarkMode } = useTheme();
 
-import { Redirect } from "expo-router";
-
-export default function HomeScreen() {
-  return <Redirect href="/login" />;
-  /*
   return (
-    
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
-      headerImage={
-        <Image source={require("@/assets/images/partial-react-logo.png")} />
-      }
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.background }]}
     >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome to the start of RemindMe!</ThemedText>
-      </ThemedView>
+      <LinearGradient
+        colors={
+          isDarkMode
+            ? ["#1f2937", "#1f2937"]
+            : ["#fff0f0", "#f0f4ff", "#f0fff4"]
+        }
+        style={StyleSheet.absoluteFill}
+      />
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">1: Go to adult login screen</ThemedText>
-        <Link href="/login" style={styles.loginLink}>
-          <ThemedText type="link">Login</ThemedText>
-        </Link>
-      </ThemedView>
+      <Text style={[styles.title, { color: theme.primary }]}>RemindME</Text>
+      <Text style={[styles.question, { color: theme.text }]}>
+        Which version of the app do you wish to use?
+      </Text>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">2: Go to adult home screen</ThemedText>
-        <Link href="/adultDashboard" style={styles.loginLink}>
-          <ThemedText type="link">Home screen</ThemedText>
-        </Link>
-      </ThemedView>
+      <View style={styles.row}>
+        <TouchableOpacity
+          style={[styles.card, { backgroundColor: theme.cardBackground }]}
+          onPress={() => router.push("/login")}
+        >
+          <Text style={styles.emoji}>👨‍💼</Text>
+          <Text style={[styles.cardTitle, { color: theme.text }]}>Adult</Text>
+        </TouchableOpacity>
 
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">2: Go to adult app settings</ThemedText>
-        <Link href="/adultSettings" style={styles.loginLink}>
-          <ThemedText type="link">adult app settings</ThemedText>
-        </Link>
-      </ThemedView>
-
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">2: Go to create account screen</ThemedText>
-        <Link href="/create-account" style={styles.loginLink}>
-          <ThemedText type="link">adult app settings</ThemedText>
-        </Link>
-      </ThemedView>
-    </ParallaxScrollView>
-  
-    
+        <TouchableOpacity
+          style={[styles.card, { backgroundColor: theme.cardBackground }]}
+          onPress={() => router.push("/kids-login")}
+        >
+          <Text style={styles.emoji}>🧒</Text>
+          <Text style={[styles.cardTitle, { color: theme.text }]}>Kid</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
-  */
 }
 
-/*
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: "row",
+  container: { flex: 1, alignItems: "center", justifyContent: "center" },
+  title: { fontSize: 36, fontWeight: "700", marginBottom: 12 },
+  question: {
+    fontSize: 18,
+    fontWeight: "600",
+    textAlign: "center",
+    marginBottom: 40,
+    paddingHorizontal: 20,
+  },
+  row: { flexDirection: "row", gap: 16, paddingHorizontal: 20 },
+  card: {
+    flex: 1,
+    borderRadius: 16,
+    padding: 24,
     alignItems: "center",
     gap: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    elevation: 3,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  loginLink: {
-    marginTop: 8,
-    paddingVertical: 8,
-  },
+  emoji: { fontSize: 48 },
+  cardTitle: { fontSize: 22, fontWeight: "700" },
 });
-*/
