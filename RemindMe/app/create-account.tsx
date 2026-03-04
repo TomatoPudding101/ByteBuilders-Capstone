@@ -15,6 +15,7 @@ const PersonIcon = require("../assets/images/person.png");
 const LockIcon = require("../assets/images/pinklock.png");
 const LockIcon2 = require("../assets/images/bluelock.png");
 const EyeIcon = require("../assets/images/eyeicon.png");
+const EyeIcon2 = require("../assets/images/EyeIcon2.png")
 
 export default function CreateAccount() {
   const [parentId, setParentId] = useState("");
@@ -85,6 +86,9 @@ export default function CreateAccount() {
               value={confirmPassword}
               onChangeText={setConfirmPassword}
             />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Image source={EyeIcon2} style={styles.icon} />
+            </TouchableOpacity>
           </View>
         </View>
 
