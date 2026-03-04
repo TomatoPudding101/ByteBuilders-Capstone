@@ -1,13 +1,15 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "./ThemeContext";
@@ -16,18 +18,59 @@ export default function ProgressScreen() {
   const { isDarkMode, theme } = useTheme();
   const router = useRouter();
 
+  const [progressStats, setProgressStats] = useState({
+    completed: 0,
+    streak: 0,
+    activeDays: 0,
+    missedDays: 0,
+  });
+
+  useEffect(() => {
+    AsyncStorage.getItem("progressStats").then((saved) => {
+      if (saved) setProgressStats(JSON.parse(saved));
+    });
+  }, []);
+
   const stats = [
-    { label: "Current Streak", value: 0, icon: "flame", color: "#F97316" },
-    { label: "Best Streak", value: 0, icon: "ribbon", color: "#F59E0B" },
+    {
+      label: "Current Streak",
+      value: progressStats.streak,
+      icon: "flame",
+      color: "#F97316",
+    },
+    {
+      label: "Best Streak",
+      value: progressStats.streak,
+      icon: "ribbon",
+      color: "#F59E0B",
+    },
     {
       label: "Total Tasks",
-      value: 0,
+      value: progressStats.completed,
       icon: "radio-button-on",
       color: "#10B981",
     },
-    { label: "Todays Rate", value: "0%", icon: "calendar", color: "#6366F1" },
-    { label: "Missed Days", value: 0, icon: "close-circle", color: "#EF4444" },
-    { label: "Active Days", value: 0, icon: "trending-up", color: "#8B5CF6" },
+    {
+      label: "Todays Rate",
+      value:
+        progressStats.completed === 0
+          ? "0%"
+          : progressStats.completed + " done",
+      icon: "calendar",
+      color: "#6366F1",
+    },
+    {
+      label: "Missed Days",
+      value: progressStats.missedDays,
+      icon: "close-circle",
+      color: "#EF4444",
+    },
+    {
+      label: "Active Days",
+      value: progressStats.activeDays,
+      icon: "trending-up",
+      color: "#8B5CF6",
+    },
   ];
 
   return (

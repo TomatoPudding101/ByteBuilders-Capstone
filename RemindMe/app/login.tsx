@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "./ThemeContext";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -24,7 +25,7 @@ export default function LoginScreen() {
   const [parentId, setParentId] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const { isDarkMode: darkMode, toggleDarkMode, theme } = useTheme();
+  const { isDarkMode: darkMode, theme } = useTheme();
 
   const handleSignIn = () => {
     console.log("Signing in with", parentId, password);
@@ -58,6 +59,12 @@ export default function LoginScreen() {
         style={[styles.bg, { backgroundColor: theme.background }]}
         resizeMode="cover"
       >
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.push("/")}
+        >
+          <Ionicons name="arrow-back" size={24} color={theme.text} />
+        </TouchableOpacity>
 
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
@@ -169,6 +176,8 @@ const styles = StyleSheet.create({
   scrollContainer: {
     alignItems: "center",
     paddingBottom: 48,
+    flexGrow: 1,
+    justifyContent: "center",
   },
   topContainer: {
     alignItems: "center",
@@ -245,5 +254,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
     marginTop: 4,
+  },
+  backButton: {
+    position: "absolute",
+    top: Platform.OS === "android" ? 40 : 64,
+    left: 16,
+    zIndex: 10,
+    padding: 8,
   },
 });
