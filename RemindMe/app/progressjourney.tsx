@@ -26,9 +26,15 @@ export default function ProgressScreen() {
   });
 
   useEffect(() => {
-    AsyncStorage.getItem("progressStats").then((saved) => {
-      if (saved) setProgressStats(JSON.parse(saved));
-    });
+    const loadStats = () => {
+      AsyncStorage.getItem("progressStats").then((saved) => {
+        if (saved) setProgressStats(JSON.parse(saved));
+      });
+    };
+
+    loadStats();
+    const interval = setInterval(loadStats, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const stats = [

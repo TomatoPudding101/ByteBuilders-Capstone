@@ -2,18 +2,23 @@ import { useTheme } from "./ThemeContext";
 
 import { useEffect, useState } from "react";
 import {
-    Alert,
-    Modal,
-    Platform,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View,
+  Alert,
+  Modal,
+  Platform,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
 } from "react-native";
+
+import {
+  ExpoSpeechRecognitionModule,
+  useSpeechRecognitionEvent,
+} from "expo-speech-recognition";
 
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -39,6 +44,10 @@ const AdultDashboard = () => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [reminderNotes, setReminderNotes] = useState("");
 
+  const [isListening, setIsListening] = useState(false);
+  const [voiceModalVisible, setVoiceModalVisible] = useState(false);
+  const [voiceTranscript, setVoiceTranscript] = useState("");
+
   const [reminderList, setReminders] = useState(persistentReminders);
 
   useEffect(() => {
@@ -50,6 +59,202 @@ const AdultDashboard = () => {
       }
     });
   }, []);
+
+  useEffect(() => {
+    if (voiceModalVisible) {
+      const timer = setTimeout(() => {
+        try {
+          ExpoSpeechRecognitionModule.start({
+            lang: "en-US",
+            interimResults: true,
+          });
+        } catch (e) {
+          console.log("Start error:", e);
+        }
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [voiceModalVisible]);
+
+  useSpeechRecognitionEvent("start", () => setIsListening(true));
+  useSpeechRecognitionEvent("end", () => setIsListening(false));
+  useSpeechRecognitionEvent("result", (event) => {
+    const text = event.results[0]?.transcript ?? "";
+    setVoiceTranscript(text);
+  });
+
+  useSpeechRecognitionEvent("error", (event) => {
+    console.log("Speech error:", event.error);
+    setIsListening(false);
+  });
+
+  const handleMicPress = () => {
+    setVoiceTranscript("");
+    setIsListening(false);
+    setVoiceModalVisible(true);
+  };
+
+  const parseTimeFromTranscript = (text: string): Date => {
+    const time = new Date();
+
+    const match =
+      text.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm|a\.m|p\.m)/i) ||
+      text.match(/(\d{1,2})(?::(\d{2}))?\s*o'?clock/i);
+
+    if (match) {
+      let hours = parseInt(match[1]);
+      const minutes = match[2] ? parseInt(match[2]) : 0;
+      const period = match[3]?.toLowerCase();
+
+      if (period?.startsWith("p") && hours !== 12) hours += 12;
+      if (period?.startsWith("a") && hours === 12) hours = 0;
+
+      time.setHours(hours, minutes, 0, 0);
+    }
+    return time;
+  };
+
+  const handleVoiceCommand = (text: string): boolean => {
+    const lower = text.toLowerCase();
+
+    if (
+      lower.includes("mark all complete") ||
+      lower.includes("complete all") ||
+      lower.includes("finish all") ||
+      lower.includes("all done") ||
+      lower.includes("all complete") ||
+      lower.includes("all tasks complete") ||
+      lower.includes("all tasks done") ||
+      lower.includes("everything done") ||
+      lower.includes("everything complete")
+    ) {
+      const uncompletedCount = persistentReminders.filter(
+        (r) => !r.completed,
+      ).length;
+      const newList = persistentReminders.map((r) => ({
+        ...r,
+        completed: true,
+      }));
+      updateReminders(() => newList);
+      saveReminders(newList);
+
+      AsyncStorage.getItem("progressStats").then((saved) => {
+        const stats = saved
+          ? JSON.parse(saved)
+          : {
+              completed: 0,
+              streak: 0,
+              activeDays: 0,
+              missedDays: 0,
+              lastCompletedDate: null,
+            };
+        stats.completed += uncompletedCount;
+        stats.activeDays += uncompletedCount;
+        const today = new Date().toDateString();
+        if (stats.lastCompletedDate !== today) {
+          stats.streak += 1;
+          stats.lastCompletedDate = today;
+        }
+        AsyncStorage.setItem("progressStats", JSON.stringify(stats)).then(
+          () => {
+            console.log("progressStats saved:", JSON.stringify(stats));
+          },
+        );
+      });
+
+      setVoiceModalVisible(false);
+      setVoiceTranscript("");
+      Alert.alert("All reminders marked completed.");
+      return true;
+    }
+
+    const matchPatterns = [
+      /mark (.+?) (?:as )?(?:complete|done|finished)/i,
+      /(.+?) (?:is )?(?:complete|done|finished)/i,
+      /complete (.+)/i,
+      /finish (.+)/i,
+      /(.+?) completed/i,
+      /(.+?) done/i,
+    ];
+
+    for (const pattern of matchPatterns) {
+      const match = text.match(pattern);
+      if (match) {
+        const spokenTitle = match[1].toLowerCase().trim();
+        const index = persistentReminders.findIndex((r) =>
+          r.title.toLowerCase().includes(spokenTitle),
+        );
+        if (index !== -1) {
+          const newList = persistentReminders.map((r, i) =>
+            i === index ? { ...r, completed: true } : r,
+          );
+          updateReminders(() => newList);
+          saveReminders(newList);
+
+          AsyncStorage.getItem("progressStats").then((saved) => {
+            const stats = saved
+              ? JSON.parse(saved)
+              : {
+                  completed: 0,
+                  streak: 0,
+                  activeDays: 0,
+                  missedDays: 0,
+                  lastCompletedDate: null,
+                };
+            if (!persistentReminders[index].completed) {
+              stats.completed += 1;
+              stats.activeDays += 1;
+              const today = new Date().toDateString();
+              if (stats.lastCompletedDate !== today) {
+                stats.streak += 1;
+                stats.lastCompletedDate = today;
+              }
+            }
+            AsyncStorage.setItem("progressStats", JSON.stringify(stats)).then(
+              () => {
+                console.log("progressStats saved:", JSON.stringify(stats));
+              },
+            );
+          });
+
+          setVoiceModalVisible(false);
+          setVoiceTranscript("");
+          Alert.alert(
+            `"${persistentReminders[index].title}" marked as completed.`,
+          );
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  const handleSaveVoiceReminder = () => {
+    if (!voiceTranscript.trim()) return;
+    try {
+      ExpoSpeechRecognitionModule.stop();
+    } catch {}
+
+    const wasCommand = handleVoiceCommand(voiceTranscript);
+    if (wasCommand) return;
+    const parsedTime = parseTimeFromTranscript(voiceTranscript);
+    const newList = [
+      ...persistentReminders,
+      {
+        title: voiceTranscript,
+        time: parsedTime.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        notes: "Created with voice",
+        completed: false,
+      },
+    ];
+    updateReminders(() => newList);
+    saveReminders(newList);
+    setVoiceModalVisible(false);
+    setVoiceTranscript("");
+  };
 
   const updateReminders = (
     updater: (prev: typeof persistentReminders) => typeof persistentReminders,
@@ -228,8 +433,12 @@ const AdultDashboard = () => {
 
       {/* Action Icons Row */}
       <View style={styles.actionRow}>
-        <TouchableOpacity style={styles.actionIcon}>
-          <Ionicons name="mic-outline" size={24} color="#666" />
+        <TouchableOpacity style={styles.actionIcon} onPress={handleMicPress}>
+          <Ionicons
+            name={isListening ? "mic" : "mic-outline"}
+            size={24}
+            color={isListening ? "#9333ea" : "#666"}
+          />
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionIcon}>
           <Ionicons name="notifications-outline" size={24} color="#666" />
@@ -388,6 +597,75 @@ const AdultDashboard = () => {
         )}
       </ScrollView>
 
+      {/* Voice Modal */}
+      <Modal visible={voiceModalVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View
+            style={[
+              styles.modalContent,
+              { backgroundColor: theme.cardBackground, maxHeight: 320 },
+            ]}
+          >
+            <Text
+              style={[
+                styles.modalTitle,
+                { color: theme.text, marginBottom: 16 },
+              ]}
+            >
+              Voice Reminder
+            </Text>
+            <Text
+              style={{
+                color: "#9333ea",
+                fontSize: 14,
+                marginBottom: 12,
+                textAlign: "center",
+              }}
+            >
+              {isListening ? "Listening..." : "Tap Save or Cancel"}
+            </Text>
+            <View
+              style={[
+                styles.input,
+                {
+                  backgroundColor: theme.inputBackground,
+                  borderColor: theme.inputBackground,
+                  justifyContent: "center",
+                  marginBottom: 20,
+                  minHeight: 60,
+                  height: "auto",
+                },
+              ]}
+            >
+              <Text style={{ color: theme.text, fontSize: 15 }}>
+                {voiceTranscript || (isListening ? "..." : "Nothing heard yet")}
+              </Text>
+            </View>
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => {
+                  try {
+                    ExpoSpeechRecognitionModule.stop();
+                  } catch {}
+                  setIsListening(false);
+                  setVoiceTranscript("");
+                  setVoiceModalVisible(false);
+                }}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.saveButton]}
+                onPress={handleSaveVoiceReminder}
+              >
+                <Text style={styles.saveButtonText}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       {/* Reminder Modal */}
       <Modal
         visible={isReminderModalVisible}
@@ -519,11 +797,14 @@ const AdultDashboard = () => {
                         <DateTimePicker
                           value={reminderTime}
                           mode="time"
-                          display="spinner"
+                          display="default"
                           style={{ height: 120 }}
                           textColor="#ffffff"
                           onChange={(event, selectedTime) => {
-                            if (selectedTime) setReminderTime(selectedTime);
+                            if (event.type === "set" && selectedTime) {
+                              setReminderTime(selectedTime);
+                            }
+                            setShowTimePicker(false);
                           }}
                         />
                       )}
