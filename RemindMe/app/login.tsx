@@ -5,6 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   ColorValue,
   Dimensions,
   ImageBackground,
@@ -19,6 +20,8 @@ import {
   View,
 } from "react-native";
 
+import { useUser } from "./userContext";
+
 const { width } = Dimensions.get("window");
 
 export default function LoginScreen() {
@@ -27,10 +30,20 @@ export default function LoginScreen() {
   const router = useRouter();
   const { isDarkMode: darkMode, theme } = useTheme();
 
-  const handleSignIn = () => {
+  const { login } = useUser();
+
+  const handleSignIn = async () => {
+    if (!parentId.trim() || !password.trim()) {
+      Alert.alert("Error", "Please enter your Parent ID and password.");
+      return;
+    }
+    const success = await login(parentId, password);
+    if (success) {
+      router.push("/adultDashboard");
+    } else {
+      Alert.alert("Error", "Invalid parent ID or password.");
+    }
     console.log("Signing in with", parentId, password);
-    router.push("/adultDashboard");
-    // Example: navigation.replace?.('MainTabs');
   };
 
   const gradientColors: readonly [ColorValue, ColorValue, ColorValue] = darkMode

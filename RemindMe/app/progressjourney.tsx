@@ -1,5 +1,4 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -13,7 +12,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "./ThemeContext";
+import { useUser } from "./userContext";
 
+const firestore = require("@react-native-firebase/firestore").default;
 export default function ProgressScreen() {
   const { isDarkMode, theme } = useTheme();
   const router = useRouter();
@@ -25,17 +26,36 @@ export default function ProgressScreen() {
     missedDays: 0,
   });
 
-  useEffect(() => {
-    const loadStats = () => {
-      AsyncStorage.getItem("progressStats").then((saved) => {
-        if (saved) setProgressStats(JSON.parse(saved));
-      });
-    };
+  const { currentUserId } = useUser();
 
-    loadStats();
-    const interval = setInterval(loadStats, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  useEffect(() => {
+    if (!currentUserId) return;
+
+    if (!__DEV__ || currentUserId !== "devuser") {
+      try {
+        const unsubscribe = firestore()
+          .collection("users")
+          .doc(currentUserId)
+          .collection("stats")
+          .doc("progressStats")
+          .onSnapshot((doc: any) => {
+            if (doc.exists && doc.data()) {
+              const data = doc.data();
+              setProgressStats({
+                completed: data.completed ?? 0,
+                streak: data.streak ?? 0,
+                activeDays: data.activeDays ?? 0,
+                missedDays: data.missedDays ?? 0,
+              });
+            }
+          });
+
+        return unsubscribe;
+      } catch {
+        console.log("Firestore not available in this enviornment");
+      }
+    }
+  }, [currentUserId]);
 
   const stats = [
     {

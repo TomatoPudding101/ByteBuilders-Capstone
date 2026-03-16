@@ -44,6 +44,9 @@
     "semver": "^7.7.3"
   },
   "devDependencies": {
+    "@react-native-firebase/app": "^23.8.8",
+    "@react-native-firebase/auth": "^23.8.8",
+    "@react-native-firebase/firestore": "^23.8.8",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",

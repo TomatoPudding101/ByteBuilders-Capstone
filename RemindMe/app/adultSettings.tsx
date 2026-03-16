@@ -1,4 +1,5 @@
 import { useTheme } from "./ThemeContext";
+import { useUser } from "./userContext";
 
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -23,6 +24,8 @@ const AdultSettings = () => {
   >("profile");
   const [fullName, setFullName] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
+
+  const { logout } = useUser();
 
   return (
     <SafeAreaView
@@ -233,7 +236,10 @@ const AdultSettings = () => {
                     borderColor: theme.inputBorder,
                   },
                 ]}
-                onPress={() => router.push("/login")}
+                onPress={async () => {
+                  await logout();
+                  router.push("./login");
+                }}
               >
                 <Text style={[styles.signOutText, { color: theme.text }]}>
                   Sign Out

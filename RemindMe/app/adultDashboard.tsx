@@ -21,11 +21,14 @@ import {
 } from "expo-speech-recognition";
 
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { useUser } from "./userContext";
+
+const firestore = require("@react-native-firebase/firestore").default;
 
 let persistentReminders: {
   title: string;
@@ -37,7 +40,7 @@ let persistentReminders: {
 const AdultDashboard = () => {
   const router = useRouter();
   const { isDarkMode, theme } = useTheme();
-
+  const { currentUser, currentUserId } = useUser();
   const [isReminderModalVisible, setIsReminderModalVisible] = useState(false);
   const [reminderTitle, setReminderTitle] = useState("");
   const [reminderTime, setReminderTime] = useState<Date>(new Date());
@@ -51,14 +54,30 @@ const AdultDashboard = () => {
   const [reminderList, setReminders] = useState(persistentReminders);
 
   useEffect(() => {
-    AsyncStorage.getItem("reminders").then((saved) => {
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        persistentReminders = parsed;
-        setReminders(parsed);
+    if (!currentUserId) return;
+    persistentReminders = [];
+    setReminders([]);
+
+    if (!__DEV__ || currentUserId !== "devuser") {
+      try {
+        const unsubscribe = firestore()
+          .collection("users")
+          .doc(currentUserId)
+          .collection("reminders")
+          .onSnapshot((snapshot: any) => {
+            const loaded = snapshot.docs.map((doc: any) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+            persistentReminders = loaded;
+            setReminders(loaded);
+          });
+        return unsubscribe;
+      } catch {
+        console.log("Firestore not available in this enviornment");
       }
-    });
-  }, []);
+    }
+  }, [currentUserId]);
 
   useEffect(() => {
     if (voiceModalVisible) {
@@ -118,10 +137,11 @@ const AdultDashboard = () => {
     const lower = text.toLowerCase();
 
     if (
+      lower.includes("all done") ||
+      lower.includes("finished all") ||
       lower.includes("mark all complete") ||
       lower.includes("complete all") ||
       lower.includes("finish all") ||
-      lower.includes("all done") ||
       lower.includes("all complete") ||
       lower.includes("all tasks complete") ||
       lower.includes("all tasks done") ||
@@ -138,29 +158,37 @@ const AdultDashboard = () => {
       updateReminders(() => newList);
       saveReminders(newList);
 
-      AsyncStorage.getItem("progressStats").then((saved) => {
-        const stats = saved
-          ? JSON.parse(saved)
-          : {
-              completed: 0,
-              streak: 0,
-              activeDays: 0,
-              missedDays: 0,
-              lastCompletedDate: null,
-            };
-        stats.completed += uncompletedCount;
-        stats.activeDays += uncompletedCount;
-        const today = new Date().toDateString();
-        if (stats.lastCompletedDate !== today) {
-          stats.streak += 1;
-          stats.lastCompletedDate = today;
-        }
-        AsyncStorage.setItem("progressStats", JSON.stringify(stats)).then(
-          () => {
-            console.log("progressStats saved:", JSON.stringify(stats));
-          },
-        );
-      });
+      firestore()
+        .collection("users")
+        .doc(currentUserId!)
+        .collection("stats")
+        .doc("progressStats")
+        .get()
+        .then((doc: any) => {
+          const stats =
+            doc.exists && doc.data()
+              ? doc.data()
+              : {
+                  completed: 0,
+                  streak: 0,
+                  activeDays: 0,
+                  missedDays: 0,
+                  lastCompletedDate: null,
+                };
+          stats.completed += uncompletedCount;
+          stats.activeDays += uncompletedCount;
+          const today = new Date().toDateString();
+          if (stats.lastCompletedDate !== today) {
+            stats.streak += 1;
+            stats.lastCompletedDate = today;
+          }
+          firestore()
+            .collection("users")
+            .doc(currentUserId!)
+            .collection("stats")
+            .doc("progressStats")
+            .set(stats);
+        });
 
       setVoiceModalVisible(false);
       setVoiceTranscript("");
@@ -191,31 +219,39 @@ const AdultDashboard = () => {
           updateReminders(() => newList);
           saveReminders(newList);
 
-          AsyncStorage.getItem("progressStats").then((saved) => {
-            const stats = saved
-              ? JSON.parse(saved)
-              : {
-                  completed: 0,
-                  streak: 0,
-                  activeDays: 0,
-                  missedDays: 0,
-                  lastCompletedDate: null,
-                };
-            if (!persistentReminders[index].completed) {
-              stats.completed += 1;
-              stats.activeDays += 1;
-              const today = new Date().toDateString();
-              if (stats.lastCompletedDate !== today) {
-                stats.streak += 1;
-                stats.lastCompletedDate = today;
+          firestore()
+            .collection("users")
+            .doc(currentUserId!)
+            .collection("stats")
+            .doc("progressStats")
+            .get()
+            .then((doc: any) => {
+              const stats =
+                doc.exists && doc.data()
+                  ? doc.data()
+                  : {
+                      completed: 0,
+                      streak: 0,
+                      activeDays: 0,
+                      missedDays: 0,
+                      lastCompletedDate: null,
+                    };
+              if (!persistentReminders[index].completed) {
+                stats.completed += 1;
+                stats.activeDays += 1;
+                const today = new Date().toDateString();
+                if (stats.lastCompletedDate !== today) {
+                  stats.streak += 1;
+                  stats.lastCompletedDate = today;
+                }
               }
-            }
-            AsyncStorage.setItem("progressStats", JSON.stringify(stats)).then(
-              () => {
-                console.log("progressStats saved:", JSON.stringify(stats));
-              },
-            );
-          });
+              firestore()
+                .collection("users")
+                .doc(currentUserId!)
+                .collection("stats")
+                .doc("progressStats")
+                .set(stats);
+            });
 
           setVoiceModalVisible(false);
           setVoiceTranscript("");
@@ -267,8 +303,21 @@ const AdultDashboard = () => {
   };
 
   const saveReminders = async (reminders: typeof persistentReminders) => {
+    if (!currentUserId) return;
     try {
-      await AsyncStorage.setItem("reminders", JSON.stringify(reminders));
+      const ref = firestore()
+        .collection("users")
+        .doc(currentUserId)
+        .collection("reminders");
+
+      const existing = await ref.get();
+      const batch = firestore().batch();
+      existing.docs.forEach((doc: any) => batch.delete(doc.ref));
+      reminders.forEach((r) => {
+        const newRef = ref.doc();
+        batch.set(newRef, r);
+      });
+      await batch.commit();
     } catch (e) {
       console.error("Error saving reminders", e);
     }
@@ -304,40 +353,54 @@ const AdultDashboard = () => {
     );
     saveReminders(persistentReminders);
 
-    AsyncStorage.getItem("progressStats").then((saved) => {
-      const stats = saved
-        ? JSON.parse(saved)
-        : {
-            completed: 0,
-            streak: 0,
-            activeDays: 0,
-            missedDays: 0,
-            lastCompletedDate: null,
-          };
+    if (!__DEV__ || currentUserId !== "devuser") return;
+    try {
+      firestore()
+        .collection("users")
+        .doc(currentUserId!)
+        .collection("stats")
+        .doc("progressStats")
+        .get()
+        .then((doc: any) => {
+          const stats =
+            doc.exists && doc.data()
+              ? doc.data()
+              : {
+                  completed: 0,
+                  streak: 0,
+                  activeDays: 0,
+                  missedDays: 0,
+                  lastCompletedDate: null,
+                };
+          if (!wasCompleted) {
+            stats.completed += 1;
+            stats.activeDays += 1;
+            const today = new Date().toDateString();
+            if (stats.lastCompletedDate !== today) {
+              stats.streak += 1;
+              stats.lastCompletedDate = today;
+            }
+          } else {
+            stats.completed = Math.max(0, stats.completed - 1);
+          }
 
-      if (!wasCompleted) {
-        stats.completed += 1;
-        stats.activeDays += 1;
+          firestore()
+            .collection("users")
+            .doc(currentUserId!)
+            .collection("stats")
+            .doc("progressStats")
+            .set(stats);
 
-        const today = new Date().toDateString();
-        if (stats.lastCompletedDate === today) {
-        } else {
-          stats.streak += 1;
-          stats.lastCompletedDate = today;
-        }
-      } else {
-        stats.completed = Math.max(0, stats.completed - 1);
-      }
-
-      AsyncStorage.setItem("progressStats", JSON.stringify(stats));
-
-      if (!wasCompleted && stats.streak >= 2) {
-        Alert.alert(
-          "🔥 You're on a streak!",
-          `${stats.streak} days in a row! Keep it up!`,
-        );
-      }
-    });
+          if (!wasCompleted && stats.streak >= 2) {
+            Alert.alert(
+              "🔥 You're on a streak!",
+              `${stats.streak} days in a row! Keep it up!`,
+            );
+          }
+        });
+    } catch {
+      console.log("Firestore not available in this enviornment");
+    }
   };
 
   const handleDeleteReminder = (index: number) => {
@@ -367,7 +430,7 @@ const AdultDashboard = () => {
           <Text style={styles.dashboardTitle}>Dashboard</Text>
           <View style={styles.userInfo}>
             <Ionicons name="person-circle-outline" size={16} color="#666" />
-            <Text style={styles.username}>TestUser</Text>
+            <Text style={styles.username}>{currentUser ?? "Guest"}</Text>
           </View>
         </View>
       </View>

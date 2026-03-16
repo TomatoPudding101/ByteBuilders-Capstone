@@ -2,6 +2,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   Image,
   StyleSheet,
   Text,
@@ -10,12 +11,13 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useUser } from "./userContext";
 
 const PersonIcon = require("../assets/images/person.png");
 const LockIcon = require("../assets/images/pinklock.png");
 const LockIcon2 = require("../assets/images/bluelock.png");
 const EyeIcon = require("../assets/images/eyeicon.png");
-const EyeIcon2 = require("../assets/images/EyeIcon2.png")
+const EyeIcon2 = require("../assets/images/EyeIcon2.png");
 
 export default function CreateAccount() {
   const [parentId, setParentId] = useState("");
@@ -24,7 +26,14 @@ export default function CreateAccount() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
-  const handleSignUp = () => {
+  const { signup } = useUser();
+
+  const handleSignUp = async () => {
+    const error = await signup(parentId, password, confirmPassword);
+    if (error) {
+      Alert.alert("Error", error);
+      return;
+    }
     console.log("Signing up with", parentId, password, confirmPassword);
     router.push("/adultDashboard");
     // Example: navigation.replace?.('MainTabs');
