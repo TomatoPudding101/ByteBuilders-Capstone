@@ -41,3 +41,9 @@ app-example
 # generated native folders
 /ios
 /android
+
+# firebase
+google-services.json
+android/app/google-services.json
+GoogleService-Info.plist
+ios/RemindMe/GoogleService-Info.plist
