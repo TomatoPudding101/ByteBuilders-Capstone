@@ -20,7 +20,7 @@ const AdultSettings = () => {
   const router = useRouter();
   const { isDarkMode, toggleDarkMode, theme } = useTheme();
   const [activeTab, setActiveTab] = useState<
-    "profile" | "preferences" | "accessibility"
+    "profile" | "parental controls" | "preferences" | "accessibility"
   >("profile");
   const [fullName, setFullName] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
@@ -95,6 +95,33 @@ const AdultSettings = () => {
             ]}
           >
             Profile
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === "parental controls" && styles.tabActive,
+            {
+              backgroundColor: theme.cardBackground,
+              borderColor: theme.border,
+            },
+          ]}
+          onPress={() => setActiveTab("parental controls")}
+        >
+          <Ionicons
+            name="shield-checkmark-outline"
+            size={18}
+            color={activeTab === "parental controls" ? "#9333EA" : "#666"}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "parental controls" && styles.tabTextActive,
+              { color: theme.text },
+            ]}
+          >
+            Parental Controls
           </Text>
         </TouchableOpacity>
 
@@ -249,6 +276,40 @@ const AdultSettings = () => {
           </>
         )}
 
+        {activeTab === "parental controls" && (
+          <>
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                Your children
+              </Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Manage your children and their tasks
+              </Text>
+
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Coming soon...
+              </Text>
+            </View>
+
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                Manage rewards
+              </Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Manage your child`s rewards
+              </Text>
+
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Coming soon...
+              </Text>
+            </View>
+          </>
+        )}
+
         {activeTab === "preferences" && (
           <>
             <View
@@ -371,6 +432,12 @@ const AdultSettings = () => {
           onPress={() => router.push("/progressjourney")}
         >
           <Ionicons name="checkmark-circle-outline" size={28} color="#F59E0B" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => router.push("/adultfocustimer")}
+        >
+          <Ionicons name="timer-outline" size={28} color="#06B6D4" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
           <Ionicons name="settings-outline" size={28} color="#06B6D4" />

@@ -33,6 +33,10 @@ export default function RootLayout() {
             name="progressjourney"
             options={{ headerShown: false }}
           />
+          <Stack.Screen
+            name="adultfocustimer"
+            options={{ headerShown: false }}
+          />
           <Stack.Screen name="kids-login" options={{ headerShown: false }} />
           <Stack.Screen name="kidshome" options={{ headerShown: false }} />
           <Stack.Screen

@@ -975,6 +975,12 @@ const AdultDashboard = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}
+          onPress={() => router.push("/adultfocustimer")}
+        >
+          <Ionicons name="timer-outline" size={28} color="#06B6D4" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
           onPress={() => router.push("/adultSettings")}
         >
           <Ionicons name="settings-outline" size={28} color="#06B6D4" />
