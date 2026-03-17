@@ -348,12 +348,13 @@ const AdultDashboard = () => {
 
   const handleCompleteReminder = (index: number) => {
     const wasCompleted = persistentReminders[index].completed;
-    updateReminders((prev) =>
-      prev.map((r, i) => (i === index ? { ...r, completed: !r.completed } : r)),
+    const newList = persistentReminders.map((r, i) =>
+      i === index ? { ...r, completed: !r.completed } : r,
     );
-    saveReminders(persistentReminders);
+    updateReminders(() => newList);
+    saveReminders(newList);
 
-    if (!__DEV__ || currentUserId !== "devuser") return;
+    if (__DEV__ && currentUserId === "devuser") return;
     try {
       firestore()
         .collection("users")
@@ -404,8 +405,9 @@ const AdultDashboard = () => {
   };
 
   const handleDeleteReminder = (index: number) => {
-    updateReminders((prev) => prev.filter((_, i) => i !== index));
-    saveReminders(persistentReminders);
+    const newList = persistentReminders.filter((_, i) => i !== index);
+    updateReminders(() => newList);
+    saveReminders(newList);
   };
 
   return (
