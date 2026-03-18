@@ -33,6 +33,7 @@ const firestore = require("@react-native-firebase/firestore").default;
 let persistentReminders: {
   title: string;
   time: string;
+  date?: string;
   notes: string;
   completed: boolean;
 }[] = [];
@@ -45,6 +46,8 @@ const AdultDashboard = () => {
   const [reminderTitle, setReminderTitle] = useState("");
   const [reminderTime, setReminderTime] = useState<Date>(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [reminderDate, setReminderDate] = useState<Date>(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [reminderNotes, setReminderNotes] = useState("");
 
   const [isListening, setIsListening] = useState(false);
@@ -131,6 +134,119 @@ const AdultDashboard = () => {
       time.setHours(hours, minutes, 0, 0);
     }
     return time;
+  };
+
+  const parseDateFromTranscript = (text: string): string => {
+    const lower = text.toLowerCase();
+    const today = new Date();
+
+    if (lower.includes("today")) {
+      return today.toDateString();
+    }
+
+    if (lower.includes("tomorrow")) {
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      return tomorrow.toDateString();
+    }
+
+    const months = [
+      "january",
+      "february",
+      "march",
+      "april",
+      "may",
+      "june",
+      "july",
+      "august",
+      "september",
+      "october",
+      "november",
+      "december",
+    ];
+    for (let i = 0; i < months.length; i++) {
+      const match = lower.match(
+        new RegExp(`${months[i]}\\s+(\\d{1,2})(?:st|nd|rd|th)?`),
+      );
+      if (match) {
+        const day = parseInt(match[1]);
+        const year = today.getFullYear();
+        const date = new Date(year, i, day);
+        if (date < today) date.setFullYear(year + 1);
+        return date.toDateString();
+      }
+    }
+
+    const days = [
+      "sunday",
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+    ];
+    for (let i = 0; i < days.length; i++) {
+      if (
+        lower.includes(`next ${days[i]}`) ||
+        lower.includes(`this ${days[i]}`)
+      ) {
+        const target = new Date(today);
+        const diff = (i + 7 - today.getDay()) % 7 || 7;
+        target.setDate(today.getDate() + diff);
+        return target.toDateString();
+      }
+    }
+
+    for (let i = 0; i < days.length; i++) {
+      if (lower.includes(days[i])) {
+        const target = new Date(today);
+        const diff = (i + 7 - today.getDay()) % 7 || 7;
+        target.setDate(today.getDate() + diff);
+        return target.toDateString();
+      }
+    }
+    return today.toDateString();
+  };
+
+  const cleanTranscriptTitle = (text: string): string => {
+    const months = [
+      "january",
+      "february",
+      "march",
+      "april",
+      "may",
+      "june",
+      "july",
+      "august",
+      "september",
+      "october",
+      "november",
+      "december",
+    ];
+    let cleaned = text
+      .replace(/\bat\s+\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m|p\.m)?/gi, "")
+      .replace(/\b(?:today|tomorrow)\b/gi, "")
+      .replace(
+        new RegExp(
+          `\\b(?:on\\s+)?(?:${months.join("|")})\\s+\\d{1,2}(?:st|nd|rd|th)?\\b`,
+          "gi",
+        ),
+        "",
+      )
+      .replace(
+        /\b(?:next|this)\s+(?:sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/gi,
+        "",
+      )
+
+      .replace(
+        /\b(?:on\s+)?(?:sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/gi,
+        "",
+      )
+      .replace(/\s{2,}/g, " ")
+      .trim();
+
+    return cleaned;
   };
 
   const handleVoiceCommand = (text: string): boolean => {
@@ -274,14 +390,18 @@ const AdultDashboard = () => {
     const wasCommand = handleVoiceCommand(voiceTranscript);
     if (wasCommand) return;
     const parsedTime = parseTimeFromTranscript(voiceTranscript);
+    const parsedDate = parseDateFromTranscript(voiceTranscript);
+    const cleanTitle = cleanTranscriptTitle(voiceTranscript);
+
     const newList = [
       ...persistentReminders,
       {
-        title: voiceTranscript,
+        title: cleanTitle,
         time: parsedTime.toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
         }),
+        date: parsedDate,
         notes: "Created with voice",
         completed: false,
       },
@@ -333,6 +453,7 @@ const AdultDashboard = () => {
           hour: "2-digit",
           minute: "2-digit",
         }),
+        date: reminderDate.toDateString(),
         notes: reminderNotes,
         completed: false,
       },
@@ -342,6 +463,7 @@ const AdultDashboard = () => {
     saveReminders(newList);
     setReminderTitle("");
     setReminderTime(new Date());
+    setReminderDate(new Date());
     setReminderNotes("");
     setIsReminderModalVisible(false);
   };
@@ -604,6 +726,18 @@ const AdultDashboard = () => {
                   }}
                 >
                   ⏰ {reminderList.time}
+                </Text>
+              ) : null}
+
+              {reminderList.date ? (
+                <Text
+                  style={{
+                    fontSize: 13,
+                    color: theme.text,
+                    marginTop: 4,
+                  }}
+                >
+                  📅 {reminderList.date}
                 </Text>
               ) : null}
               {reminderList.notes ? (
@@ -893,6 +1027,100 @@ const AdultDashboard = () => {
                           }}
                         >
                           Confirm Time
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+
+                <View style={styles.inputGroup}>
+                  <Text style={[styles.statLabel, { color: theme.text }]}>
+                    Date
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => setShowDatePicker(!showDatePicker)}
+                    style={[
+                      styles.input,
+                      {
+                        backgroundColor: theme.inputBackground,
+                        borderColor: theme.inputBorder,
+                        justifyContent: "center",
+                      },
+                    ]}
+                  >
+                    <Text style={{ color: theme.text, fontSize: 15 }}>
+                      {reminderDate.toLocaleDateString([], {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </Text>
+                  </TouchableOpacity>
+                  {showDatePicker && (
+                    <View
+                      style={{
+                        backgroundColor: "#1f2937",
+                        borderRadius: 10,
+                        overflow: "hidden",
+                        marginTop: 10,
+                        marginBottom: 2,
+                      }}
+                    >
+                      {Platform.OS === "web" ? (
+                        <input
+                          type="time"
+                          style={{
+                            width: "100%",
+                            padding: "12px",
+                            fontSize: "16px",
+                            backgroundColor: "#1f2937",
+                            color: "#ffffff",
+                            border: "none",
+                            outline: "none",
+                            cursor: "pointer",
+                          }}
+                          defaultValue={
+                            reminderDate.toISOString().split("T")[0]
+                          }
+                          onBlur={(e) => {
+                            const val = e.target.value;
+                            if (!val) return;
+                            setReminderDate(new Date(val));
+                          }}
+                        />
+                      ) : (
+                        <DateTimePicker
+                          value={reminderDate}
+                          mode="date"
+                          display="default"
+                          onChange={(event, selectedDate) => {
+                            if (event.type === "set" && selectedDate) {
+                              setReminderDate(selectedDate);
+                            }
+                            setShowDatePicker(false);
+                          }}
+                        />
+                      )}
+                      <TouchableOpacity
+                        onPress={() => setShowDatePicker(false)}
+                        style={{
+                          backgroundColor: "#9333ea",
+                          paddingVertical: 10,
+                          borderRadius: 8,
+                          alignItems: "center",
+                          marginTop: 8,
+                          marginHorizontal: 10,
+                          marginBottom: 10,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: "#FFF",
+                            fontWeight: "600",
+                            fontSize: 15,
+                          }}
+                        >
+                          Confirm Date
                         </Text>
                       </TouchableOpacity>
                     </View>

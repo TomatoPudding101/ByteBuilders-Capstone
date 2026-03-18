@@ -492,17 +492,19 @@ const styles = StyleSheet.create({
 
   tabContainer: {
     flexDirection: "row",
-    paddingHorizontal: 20,
-    gap: 12,
+    paddingHorizontal: 12,
+    gap: 6,
     marginBottom: 20,
   },
 
   tab: {
-    flexDirection: "row",
+    flex: 1,
+    flexDirection: "column",
     alignItems: "center",
-    gap: 6,
+    justifyContent: "center",
+    gap: 4,
     paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: 4,
     borderRadius: 8,
     backgroundColor: "#FFF",
   },
@@ -515,6 +517,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#666",
     fontWeight: "500",
+    textAlign: "center",
   },
 
   tabTextActive: {

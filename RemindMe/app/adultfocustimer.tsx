@@ -3,13 +3,13 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-    Alert,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "./ThemeContext";
@@ -45,10 +45,8 @@ export default function FocusTimer() {
             clearInterval(intervalRef.current!);
             setIsRunning(false);
             setSessions((s) => s + 1);
-            Alert.alert(
-              "Done!",
-              `${presets}[selectedPreset].label} session complete!`,
-            );
+            const label = presets[selectedPreset].label;
+            Alert.alert("Done!", `${label} session complete!`);
             return 0;
           }
           return prev - 1;
