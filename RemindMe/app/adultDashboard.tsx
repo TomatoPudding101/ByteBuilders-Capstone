@@ -1209,6 +1209,12 @@ const AdultDashboard = () => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}
+          onPress={() => router.push("/adultcalender")}
+        >
+          <Ionicons name="calendar-outline" size={28} color="#f50b9bd3" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
           onPress={() => router.push("/adultSettings")}
         >
           <Ionicons name="settings-outline" size={28} color="#06B6D4" />
@@ -1470,14 +1476,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 16,
     paddingBottom: 20,
-    backgroundColor: "#FFF",
     borderTopWidth: 1,
-    borderTopColor: "#F3F4F6",
   },
-
-  navItem: {
-    padding: 8,
-  },
+  navItem: { padding: 8 },
 });
 
 export default AdultDashboard;

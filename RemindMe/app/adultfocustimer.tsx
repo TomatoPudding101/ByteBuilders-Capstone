@@ -231,6 +231,12 @@ export default function FocusTimer() {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navItem}
+          onPress={() => router.push("/adultcalender")}
+        >
+          <Ionicons name="calendar-outline" size={28} color="#f50b9bd3" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navItem}
           onPress={() => router.push("/adultSettings")}
         >
           <Ionicons name="settings-outline" size={28} color="#06B6D4" />

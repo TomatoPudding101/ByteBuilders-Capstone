@@ -37,6 +37,7 @@ export default function RootLayout() {
             name="adultfocustimer"
             options={{ headerShown: false }}
           />
+          <Stack.Screen name="adultcalender" options={{ headerShown: false }} />
           <Stack.Screen name="kids-login" options={{ headerShown: false }} />
           <Stack.Screen name="kidshome" options={{ headerShown: false }} />
           <Stack.Screen
