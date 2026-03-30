@@ -1,11 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "./ThemeContext";
-
 import { LinearGradient } from "expo-linear-gradient";
+import * as LocalAuthentication from "expo-local-authentication";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import * as SecureStore from "expo-secure-store";
+import React, { useEffect, useState } from "react";
 import {
-  Alert,
   ColorValue,
   Dimensions,
   ImageBackground,
@@ -17,34 +16,71 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
+import { useTheme } from "./ThemeContext";
 
-import { useUser } from "./userContext";
 
 const { width } = Dimensions.get("window");
 
 export default function LoginScreen() {
+  const [faceIDSupported, setFaceIDSupported] = useState(false);
   const [parentId, setParentId] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
   const { isDarkMode: darkMode, theme } = useTheme();
 
-  const { login } = useUser();
-
   const handleSignIn = async () => {
-    if (!parentId.trim() || !password.trim()) {
-      Alert.alert("Error", "Please enter your Parent ID and password.");
+    console.log("Signing in with", parentId, password);
+
+    // Save credentials securely
+    await SecureStore.setItemAsync("userLoggedIn", "true");
+
+    router.replace("/adultDashboard");
+    // Example: navigation.replace?.('MainTabs');
+  };
+
+  const handleFaceIDLogin = async () => {
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+    const enrolled = await LocalAuthentication.isEnrolledAsync();
+
+    if (!hasHardware || !enrolled) {
+      alert("Face ID not available or not set up on this device.");
       return;
     }
-    const success = await login(parentId, password);
-    if (success) {
-      router.push("/adultDashboard");
-    } else {
-      Alert.alert("Error", "Invalid parent ID or password.");
+
+    const result = await LocalAuthentication.authenticateAsync({
+      promptMessage: "Log in with Face ID",
+      fallbackLabel: "Use Password",
+    });
+
+    if (result.success) {
+      console.log("Face ID authentication successful");
+      router.replace("/adultDashboard");
     }
-    console.log("Signing in with", parentId, password);
   };
+
+  useEffect(() => {
+    const checkFaceID = async () => {
+      const compatible = await LocalAuthentication.hasHardwareAsync();
+      const enrolled = await LocalAuthentication.isEnrolledAsync();
+      setFaceIDSupported(compatible && enrolled);
+
+      const storedUser = await SecureStore.getItemAsync("userLoggedIn");
+
+      if (compatible && enrolled && storedUser === "true") {
+        setFaceIDSupported(true);
+      }
+    };
+
+    checkFaceID();
+  }, []);
+
+  useEffect(() => {
+    if (faceIDSupported) {
+      handleFaceIDLogin();
+    }
+  }, [faceIDSupported]);
 
   const gradientColors: readonly [ColorValue, ColorValue, ColorValue] = darkMode
     ? ["#4b3bff", "#a22ee0", "#ff2f65"]
@@ -156,6 +192,19 @@ export default function LoginScreen() {
               </LinearGradient>
             </TouchableOpacity>
 
+            {/* Face ID Button */}
+            {faceIDSupported && (
+              <TouchableOpacity
+                onPress={handleFaceIDLogin}
+                style={styles.faceIDButton}
+              >
+                <Ionicons name="scan-outline" size={28} color={theme.primary} />
+                <Text style={[styles.faceIDText, { color: theme.text}]}>
+                  Sign in with Face ID
+                </Text>
+              </TouchableOpacity>
+            )}
+
             {/* Divider */}
             <View
               style={[styles.divider, { backgroundColor: gradientColors[0] }]}
@@ -250,6 +299,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
     textAlign: "center",
+  },
+  faceIDButton: {
+    marginTop: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    padding: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+  },
+  faceIDText: {
+    fontSize: 14,
+    fontWeight: "600",
   },
   divider: {
     height: 1,
