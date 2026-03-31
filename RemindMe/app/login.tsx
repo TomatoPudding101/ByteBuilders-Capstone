@@ -43,6 +43,8 @@ export default function LoginScreen() {
     if (success) {
       if (Platform.OS !== "web") {
         await SecureStore.setItemAsync("userLoggedIn", "true");
+        await SecureStore.setItemAsync("savedParentId", parentId);
+        await SecureStore.setItemAsync("savedPassword", password);
       }
       router.replace("/adultDashboard");
     } else {
@@ -56,12 +58,6 @@ export default function LoginScreen() {
 
     const hasHardware = await LocalAuthentication.hasHardwareAsync();
     const enrolled = await LocalAuthentication.isEnrolledAsync();
-    const supportedTypes =
-      await LocalAuthentication.supportedAuthenticationTypesAsync();
-
-    console.log("hasHardware:", hasHardware);
-    console.log("enrolled:", enrolled);
-    console.log("supportedTypes:", supportedTypes);
 
     if (!hasHardware || !enrolled) {
       alert("Face ID not available or not set up on this device.");
@@ -74,12 +70,24 @@ export default function LoginScreen() {
       disableDeviceFallback: true,
     });
 
-    console.log("Face ID result:", result);
-
     if (result.success) {
-      console.log("Face ID authenticated succesfully");
-      router.replace("/adultDashboard");
+      const savedParentId = await SecureStore.getItemAsync("savedParentId");
+      const savedPassword = await SecureStore.getItemAsync("savedPassword");
+
+      if (!savedParentId || !savedPassword) {
+        alert("No saved account found.");
+        return;
+      }
+      const success = await login(savedParentId, savedPassword);
+      if (success) {
+        await SecureStore.setItemAsync("userLoggedIn", "true");
+        router.replace("/adultDashboard");
+      } else {
+        alert("Face ID login failed. Please log in with parent ID.");
+      }
     }
+
+    console.log("Face ID result:", result);
   };
 
   useEffect(() => {
