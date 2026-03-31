@@ -16,10 +16,9 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { useTheme } from "./ThemeContext";
-
 
 const { width } = Dimensions.get("window");
 
@@ -41,8 +40,16 @@ export default function LoginScreen() {
   };
 
   const handleFaceIDLogin = async () => {
+    console.log("Face ID tapped");
+
     const hasHardware = await LocalAuthentication.hasHardwareAsync();
     const enrolled = await LocalAuthentication.isEnrolledAsync();
+    const supportedTypes =
+      await LocalAuthentication.supportedAuthenticationTypesAsync();
+
+    console.log("hasHardware:", hasHardware);
+    console.log("enrolled:", enrolled);
+    console.log("supportedTypes:", supportedTypes);
 
     if (!hasHardware || !enrolled) {
       alert("Face ID not available or not set up on this device.");
@@ -52,10 +59,13 @@ export default function LoginScreen() {
     const result = await LocalAuthentication.authenticateAsync({
       promptMessage: "Log in with Face ID",
       fallbackLabel: "Use Password",
+      disableDeviceFallback: true,
     });
 
+    console.log("Face ID result:", result);
+
     if (result.success) {
-      console.log("Face ID authentication successful");
+      console.log("Face ID failed. Use you password instead.");
       router.replace("/adultDashboard");
     }
   };
@@ -199,7 +209,7 @@ export default function LoginScreen() {
                 style={styles.faceIDButton}
               >
                 <Ionicons name="scan-outline" size={28} color={theme.primary} />
-                <Text style={[styles.faceIDText, { color: theme.text}]}>
+                <Text style={[styles.faceIDText, { color: theme.text }]}>
                   Sign in with Face ID
                 </Text>
               </TouchableOpacity>
