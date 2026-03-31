@@ -20,6 +20,8 @@ import {
 } from "react-native";
 import { useTheme } from "./ThemeContext";
 
+import { useUser } from "./userContext";
+
 const { width } = Dimensions.get("window");
 
 export default function LoginScreen() {
@@ -28,15 +30,25 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const router = useRouter();
   const { isDarkMode: darkMode, theme } = useTheme();
+  const { login } = useUser();
 
   const handleSignIn = async () => {
+    if (!parentId || !password) {
+      alert("Please enter your parent ID and password.");
+      return;
+    }
+
+    const success = await login(parentId, password);
+
+    if (success) {
+      if (Platform.OS !== "web") {
+        await SecureStore.setItemAsync("userLoggedIn", "true");
+      }
+      router.replace("/adultDashboard");
+    } else {
+      alert("Invalud Parent ID or password. Please try again.");
+    }
     console.log("Signing in with", parentId, password);
-
-    // Save credentials securely
-    await SecureStore.setItemAsync("userLoggedIn", "true");
-
-    router.replace("/adultDashboard");
-    // Example: navigation.replace?.('MainTabs');
   };
 
   const handleFaceIDLogin = async () => {
@@ -65,32 +77,22 @@ export default function LoginScreen() {
     console.log("Face ID result:", result);
 
     if (result.success) {
-      console.log("Face ID failed. Use you password instead.");
+      console.log("Face ID authenticated succesfully");
       router.replace("/adultDashboard");
     }
   };
 
   useEffect(() => {
     const checkFaceID = async () => {
+      if (Platform.OS === "web") return;
+
       const compatible = await LocalAuthentication.hasHardwareAsync();
       const enrolled = await LocalAuthentication.isEnrolledAsync();
       setFaceIDSupported(compatible && enrolled);
-
-      const storedUser = await SecureStore.getItemAsync("userLoggedIn");
-
-      if (compatible && enrolled && storedUser === "true") {
-        setFaceIDSupported(true);
-      }
     };
 
     checkFaceID();
   }, []);
-
-  useEffect(() => {
-    if (faceIDSupported) {
-      handleFaceIDLogin();
-    }
-  }, [faceIDSupported]);
 
   const gradientColors: readonly [ColorValue, ColorValue, ColorValue] = darkMode
     ? ["#4b3bff", "#a22ee0", "#ff2f65"]
