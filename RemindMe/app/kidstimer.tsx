@@ -60,7 +60,6 @@ export default function TimerScreen() {
         <Text style={styles.backText}>←</Text>
       </TouchableOpacity>
 
-      {/* Task Name */}
       <TextInput
         placeholder="ENTER TASK NAME"
         placeholderTextColor="#444"
@@ -71,7 +70,6 @@ export default function TimerScreen() {
         numberOfLines={2}
       />
 
-      {/* Timer Circle */}
       <View style={styles.circle}>
         <Text style={styles.timeText}>{formatTime()}</Text>
         <Text style={styles.subText}>
@@ -79,7 +77,6 @@ export default function TimerScreen() {
         </Text>
       </View>
 
-      {/* Start Button */}
       <TouchableOpacity
         style={styles.startBtn}
         onPress={() => setRunning(!running)}
@@ -89,7 +86,6 @@ export default function TimerScreen() {
         </Text>
       </TouchableOpacity>
 
-      {/* Presets */}
       <View style={styles.presetsContainer}>
         {presetRows.map((row, rowIndex) => (
           <View key={rowIndex} style={styles.row}>
