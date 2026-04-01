@@ -13,7 +13,7 @@ const MENU_ITEMS = [
     label: 'Calendar',
     image: require('../assets/images/dash-icons/Calendar.jpg'),
     color: '#5588e0',
-    route: '/calendar',
+    route: '/kidscalendar',
   },
   {
     label: 'My Progress',
@@ -31,7 +31,7 @@ const MENU_ITEMS = [
     label: 'Focus Timer',
     image: require('../assets/images/dash-icons/Focus-Timer.jpg'),
     color: '#e040a0',
-    route: '/focus-timer',
+    route: '/kidstimer',
   },
   {
     label: 'Settings',
