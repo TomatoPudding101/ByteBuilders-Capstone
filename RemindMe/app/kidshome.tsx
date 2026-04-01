@@ -9,10 +9,10 @@ const MENU_ITEMS = [
     color: "#9b6fd4",
     route: "/goals",
   },
-  { label: "Calendar", icon: "📅", color: "#5588e0", route: "/calendar" },
+  { label: "Calendar", icon: "📅", color: "#5588e0", route: "/kidscalendar" },
   { label: "My Progress", icon: "📈", color: "#3cc470", route: "/progress" },
   { label: "Rewards", icon: "🎖️", color: "#d4a020", route: "/rewards" },
-  { label: "Focus Timer", icon: "⏱️", color: "#e040a0", route: "/focus-timer" },
+  { label: "Focus Timer", icon: "⏱️", color: "#e040a0", route: "/kidstimer" },
   { label: "Settings", icon: "⚙️", color: "#6655cc", route: "/settings" },
 ];
 
