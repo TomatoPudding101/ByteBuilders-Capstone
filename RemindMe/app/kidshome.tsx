@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 const MENU_ITEMS = [
   {
     label: 'Goals / Chores',
-    image: require('../assets/images/dash-icons/Goals-Chores.jpg'),
+    image: require('../assets/images/Goals-Chores.jpg'),
     color: '#9b6fd4',
     route: '/kidsgoals',
   },
