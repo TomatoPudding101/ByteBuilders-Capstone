@@ -55,7 +55,7 @@ export default function KidsHome() {
  
        {/* Welcome Banner Image */}
 <Image
-  source={require('../assets/images/dash-icons/welcome-banner.png')}
+  source={require('../assets/images/welcome-banner.png')}
   style={styles.bannerImage}
   resizeMode="cover"
 />
@@ -65,7 +65,7 @@ export default function KidsHome() {
           <Text style={styles.dashTitle}>My Dashboard</Text>
           <View style={styles.nameTagContainer}>
             <Image
-              source={require('../assets/images/dash-icons/Penguin.jpg')}
+              source={require('../assets/images/Penguin.jpg')}
               style={styles.penguinImage}
               resizeMode="cover"
             />
