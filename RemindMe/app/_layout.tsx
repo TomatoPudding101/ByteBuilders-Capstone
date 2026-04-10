@@ -45,6 +45,11 @@ export default function RootLayout() {
             options={{ headerShown: false }}
           />
           <Stack.Screen name="kidsregister" options={{ headerShown: false }} />
+          <Stack.Screen name="kidsgoals" options={{ headerShown: false }} />
+          <Stack.Screen name="kidscalendar" options={{ headerShown: false }} />
+          <Stack.Screen name="kidsprogress1" options={{ headerShown: false }} />
+          <Stack.Screen name="kidsrewards1" options={{ headerShown: false }} />
+          <Stack.Screen name="kidstimer" options={{ headerShown: false }} />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>
