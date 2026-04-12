@@ -1,7 +1,9 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,6 +11,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+const auth = require("@react-native-firebase/auth").default;
+const firestore = require("@react-native-firebase/firestore").default;
 
 const NAME_TAGS = [
   { id: "penguin", emoji: "🐧" },
@@ -22,7 +27,51 @@ export default function Register() {
   const [pin, setPin] = useState("");
   const [email, setEmail] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const handleSave = async () => {
+    if (!name.trim()) return Alert.alert("Oops!", "Please enter your name");
+    if (pin.length !== 5)
+      return Alert.alert("Oops!", "Your PIN must be exactly 5 numbers");
+    if (!email.trim())
+      return Alert.alert("Oops!", "Please enter a parent's email");
+    if (!selectedTag) return Alert.alert("Oops!", "Please pick a name tag.");
+
+    setLoading(true);
+    try {
+      const kidEmail = `kid.${name.trim().toLowerCase().replace(/\s+/g, ".")}@remindme.app`;
+
+      const firebasePin = pin + "0";
+      const result = await auth().createUserWithEmailAndPassword(
+        kidEmail,
+        firebasePin,
+      );
+
+      await firestore().collection("kids").doc(result.user.uid).set({
+        name: name.trim(),
+        nametag: selectedTag,
+        email: email.trim().toLowerCase(),
+        points: 0,
+        createdAt: firestore.FieldValue.serverTimestamp(),
+      });
+
+      await AsyncStorage.setItem("kidEmail", kidEmail);
+      await AsyncStorage.setItem("kidName", name.trim());
+
+      Alert.alert("Account created!", `Welcome, ${name}! 🎉`);
+      router.push("./kids-login");
+    } catch (e: any) {
+      console.log("Error:", e.code, e.message);
+      if (e.code === "auth/email-already-in-use") {
+        Alert.alert("Oops!", "An account with that name already exists.");
+      } else {
+        Alert.alert("Oops!", "Something went wrong. Please try again");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <LinearGradient
@@ -100,8 +149,10 @@ export default function Register() {
         </View>
 
         {/* Save Button */}
-        <TouchableOpacity onPress={() => router.push("./kids-login")}>
-          <Text style={styles.saveText}>Save</Text>
+        <TouchableOpacity onPress={handleSave} disabled={loading}>
+          <Text style={[styles.saveText, loading && { opacity: 0.5 }]}>
+            {loading ? "Saving..." : "Save"}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </LinearGradient>

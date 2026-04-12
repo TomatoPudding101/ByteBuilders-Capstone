@@ -1,3 +1,4 @@
+import { useRewards } from "./rewardContext";
 import { useTheme } from "./ThemeContext";
 import { useUser } from "./userContext";
 
@@ -24,8 +25,76 @@ const AdultSettings = () => {
   >("profile");
   const [fullName, setFullName] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
+  const { children: kids, addPoints } = useRewards();
 
   const { logout } = useUser();
+
+  const REWARDS = [
+    {
+      id: 1,
+      label: "Unlock 2 profile characters",
+      points: 5,
+      color: "#c8a8e8",
+      dark: "#7040b0",
+      icon: "👤",
+    },
+    {
+      id: 2,
+      label: "Choose your background",
+      points: 10,
+      color: "#a8d8c8",
+      dark: "#208060",
+      icon: "🖼️",
+    },
+    {
+      id: 3,
+      label: "Special surprise!",
+      points: 25,
+      color: "#a8c8e8",
+      dark: "#205090",
+      icon: "🎁",
+    },
+    {
+      id: 4,
+      label: "15 min extra screen time",
+      points: 50,
+      color: "#f8d8a8",
+      dark: "#905010",
+      icon: "📱",
+    },
+    {
+      id: 5,
+      label: "Stay up 15 min later",
+      points: 75,
+      color: "#f8c8d0",
+      dark: "#902040",
+      icon: "🌙",
+    },
+    {
+      id: 6,
+      label: "Choose dinner tonight",
+      points: 100,
+      color: "#d0e8a8",
+      dark: "#406010",
+      icon: "🍽️",
+    },
+    {
+      id: 7,
+      label: "Small treat",
+      points: 200,
+      color: "#e8d0a8",
+      dark: "#704010",
+      icon: "🍬",
+    },
+    {
+      id: 8,
+      label: "Small toy",
+      points: 300,
+      color: "#d8a8e8",
+      dark: "#602080",
+      icon: "🧸",
+    },
+  ];
 
   return (
     <SafeAreaView
@@ -300,12 +369,56 @@ const AdultSettings = () => {
                 Manage rewards
               </Text>
               <Text style={[styles.cardSubtitle, { color: theme.text }]}>
-                Manage your child`s rewards
+                Manage your child`s rewards and points
               </Text>
 
-              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
-                Coming soon...
+              {kids.map((kid) => (
+                <View key={kid.id} style={rewardStyles.kidRow}>
+                  <View style={rewardStyles.kidInfo}>
+                    <Text style={[rewardStyles.kidName, { color: theme.text }]}>
+                      {kid.name}
+                    </Text>
+                    <Text style={rewardStyles.kidPoints}>
+                      ⭐ {kid.points} pts
+                    </Text>
+                  </View>
+                  <View style={rewardStyles.btnRow}>
+                    {[5, 10, 25, 50].map((amt) => (
+                      <TouchableOpacity
+                        key={amt}
+                        style={rewardStyles.awardBtn}
+                        onPress={() => addPoints(kid.id, amt)}
+                      >
+                        <Text style={rewardStyles.awardBtnText}>+{amt}</Text>
+                      </TouchableOpacity>
+                    ))}
+                    <TouchableOpacity
+                      style={rewardStyles.deduceBtn}
+                      onPress={() => addPoints(kid.id, -10)}
+                    >
+                      <Text style={rewardStyles.deduceBtnText}>-10</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+
+              <Text style={[rewardStyles.tierTitle, { color: theme.text }]}>
+                Reward Tiers
               </Text>
+              {REWARDS.map((r) => (
+                <View
+                  key={r.id}
+                  style={[rewardStyles.tierRow, { backgroundColor: r.color }]}
+                >
+                  <Text style={rewardStyles.tierIcon}>{r.icon}</Text>
+                  <Text style={[rewardStyles.tierLabel, { color: r.dark }]}>
+                    {r.label}
+                  </Text>
+                  <Text style={[rewardStyles.tierPts, { color: r.dark }]}>
+                    {r.points} pts
+                  </Text>
+                </View>
+              ))}
             </View>
           </>
         )}
@@ -684,6 +797,85 @@ const styles = StyleSheet.create({
 
   toggleCircleActive: {
     transform: [{ translateX: 20 }],
+  },
+});
+
+const rewardStyles = StyleSheet.create({
+  kidRow: {
+    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F3F4F6",
+    paddingBottom: 12,
+  },
+  kidInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+
+  kidName: {
+    fontSize: 16,
+    fontWeight: "700",
+  },
+
+  kidPoints: {
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  btnRow: {
+    flexDirection: "row",
+    gap: 6,
+    flexWrap: "wrap",
+  },
+  awardBtn: {
+    backgroundColor: "#9333ea",
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+  },
+  awardBtnText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 13,
+  },
+  deduceBtn: {
+    backgroundColor: "#fee2e2",
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+  },
+  deduceBtnText: {
+    color: "#dc2626",
+    fontWeight: "700",
+    fontSize: 13,
+  },
+  tierTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  tierRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 10,
+    padding: 8,
+    marginBottom: 6,
+    gap: 8,
+  },
+  tierIcon: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  tierLabel: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  tierPts: {
+    fontSize: 12,
+    fontWeight: "700",
   },
 });
 

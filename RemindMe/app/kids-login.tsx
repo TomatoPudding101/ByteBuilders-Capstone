@@ -1,7 +1,10 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
+const auth = require("@react-native-firebase/auth").default;
 
 const PIN_LENGTH = 5;
 
@@ -22,7 +25,20 @@ const KEY_COLORS: Record<string, string> = {
 
 export default function KidsLogin() {
   const [pin, setPin] = useState<string[]>([]);
+  const [kidEmail, setKidEmail] = useState<string | null>(null);
+  const [kidName, setKidName] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const loadSavedKid = async () => {
+      const savedEmail = await AsyncStorage.getItem("kidEmail");
+      const savedName = await AsyncStorage.getItem("kidName");
+      setKidEmail(savedEmail);
+      setKidName(savedName);
+    };
+    loadSavedKid();
+  }, []);
 
   const handleKey = (key: string) => {
     if (key === "⌫") {
@@ -34,11 +50,28 @@ export default function KidsLogin() {
     }
   };
 
-  const handleLetsGo = () => {
-    if (pin.length === PIN_LENGTH) {
+  const handleLetsGo = async () => {
+    if (pin.length !== PIN_LENGTH)
+      return Alert.alert("Enter your full 5-digit PIN");
+
+    setLoading(true);
+    try {
+      const pinString = pin.join("") + "0";
+      await auth().signInWithEmailAndPassword(kidEmail, pinString);
       router.push("./kidshome");
-    } else {
-      Alert.alert("Enter your full 5-digit PIN");
+    } catch (e: any) {
+      console.log("Kids login error:", e.code);
+      if (
+        e.code === "auth/wrong-password" ||
+        e.code === "auth/invalid-credential"
+      ) {
+        Alert.alert("Wrong PIN!", "Try again.");
+        setPin([]);
+      } else {
+        Alert.alert("Oops!", "Something went wrong. Please try again.");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,6 +82,9 @@ export default function KidsLogin() {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
+      {kidName && (
+        <Text style={styles.welcomeText}> Welcome back, {kidName}! </Text>
+      )}
       {/* PIN Display Box */}
       <View style={styles.pinBox}>
         <Text style={styles.pinTitle}>Enter Your Pin</Text>
@@ -85,8 +121,14 @@ export default function KidsLogin() {
       </View>
 
       {/* Let's Go Button */}
-      <TouchableOpacity style={styles.letsGoButton} onPress={handleLetsGo}>
-        <Text style={styles.letsGoText}>Let`s Go!</Text>
+      <TouchableOpacity
+        style={[styles.letsGoButton, loading && { opacity: 0.6 }]}
+        onPress={handleLetsGo}
+        disabled={loading}
+      >
+        <Text style={styles.letsGoText}>
+          {loading ? "Checking..." : "Let`s Go!"}
+        </Text>
       </TouchableOpacity>
 
       {/* Forgot Password / New User */}
@@ -145,6 +187,11 @@ const styles = StyleSheet.create({
   dotFilled: {
     borderColor: "#fff",
     backgroundColor: "#fff",
+  },
+  welcomeText: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#555",
   },
   keypad: {
     gap: 12,
