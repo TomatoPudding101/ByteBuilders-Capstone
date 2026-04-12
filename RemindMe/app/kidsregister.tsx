@@ -25,7 +25,6 @@ const NAME_TAGS = [
 export default function Register() {
   const [name, setName] = useState("");
   const [pin, setPin] = useState("");
-  const [email, setEmail] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -34,13 +33,11 @@ export default function Register() {
     if (!name.trim()) return Alert.alert("Oops!", "Please enter your name");
     if (pin.length !== 5)
       return Alert.alert("Oops!", "Your PIN must be exactly 5 numbers");
-    if (!email.trim())
-      return Alert.alert("Oops!", "Please enter a parent's email");
     if (!selectedTag) return Alert.alert("Oops!", "Please pick a name tag.");
 
     setLoading(true);
     try {
-      const kidEmail = `kid.${name.trim().toLowerCase().replace(/\s+/g, ".")}@remindme.app`;
+      const kidEmail = `kid${Date.now()}@remindme.app`;
 
       const firebasePin = pin + "0";
       const result = await auth().createUserWithEmailAndPassword(
@@ -51,7 +48,6 @@ export default function Register() {
       await firestore().collection("kids").doc(result.user.uid).set({
         name: name.trim(),
         nametag: selectedTag,
-        email: email.trim().toLowerCase(),
         points: 0,
         createdAt: firestore.FieldValue.serverTimestamp(),
       });
@@ -110,7 +106,7 @@ export default function Register() {
             secureTextEntry
           />
 
-          {/* Email */}
+          {/*
           <Text style={styles.label}>Enter Parent/Supervisor{"\n"}Email</Text>
           <TextInput
             style={styles.input}
@@ -121,6 +117,7 @@ export default function Register() {
             keyboardType="email-address"
             autoCapitalize="none"
           />
+          */}
 
           {/* Name Tag Selector */}
           <Text style={styles.label}>Select Name Tag</Text>
