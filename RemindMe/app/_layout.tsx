@@ -6,10 +6,6 @@ import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { RewardsProvider } from "./rewardContext";
 
-export const unstable_settings = {
-  anchor: "(index)",
-};
-
 export default function RootLayout() {
   return (
     <UserProvider>
