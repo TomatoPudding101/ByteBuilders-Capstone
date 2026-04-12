@@ -58,6 +58,7 @@ export default function LoginScreen() {
 
     const hasHardware = await LocalAuthentication.hasHardwareAsync();
     const enrolled = await LocalAuthentication.isEnrolledAsync();
+    console.log("hasHardware:", hasHardware, "enrolled:", enrolled);
 
     if (!hasHardware || !enrolled) {
       alert("Face ID not available or not set up on this device.");
@@ -95,8 +96,7 @@ export default function LoginScreen() {
       if (Platform.OS === "web") return;
 
       const compatible = await LocalAuthentication.hasHardwareAsync();
-      const enrolled = await LocalAuthentication.isEnrolledAsync();
-      setFaceIDSupported(compatible && enrolled);
+      setFaceIDSupported(compatible || __DEV__);
     };
 
     checkFaceID();
