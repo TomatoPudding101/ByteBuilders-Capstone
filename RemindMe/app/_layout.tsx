@@ -7,7 +7,7 @@ import "react-native-reanimated";
 import { RewardsProvider } from "./rewardContext";
 
 export const unstable_settings = {
-  anchor: "(tabs)",
+  anchor: "(index)",
 };
 
 export default function RootLayout() {
