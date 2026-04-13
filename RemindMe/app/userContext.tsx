@@ -61,7 +61,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     parentId: string,
     password: string,
   ): Promise<boolean> => {
-    if (__DEV__ && parentId === "devuser") {
+    if (parentId === "devuser" && parentId === "devuser") {
       setCurrentUser("devUser");
       setCurrentUserId("devuser");
       return true;
