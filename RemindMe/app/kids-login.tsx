@@ -1,11 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const auth = require("@react-native-firebase/auth").default;
-const firestore = require("@react-native-firebase/firestore").default
+const firestore = require("@react-native-firebase/firestore").default;
 
 const PIN_LENGTH = 5;
 
@@ -71,10 +71,10 @@ export default function KidsLogin() {
       if (loggedIn) {
         router.push("./kidshome");
       } else {
-        Alert.alert("Wrong PIN!", "Try again.")
+        Alert.alert("Wrong PIN!", "Try again.");
         setPin([]);
       }
-    } catch (e) {
+    } catch {
       Alert.alert("Oops!", "Something went wrong. Please try again.");
     } finally {
       setLoading(false);

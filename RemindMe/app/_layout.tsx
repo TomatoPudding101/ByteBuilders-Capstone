@@ -66,6 +66,7 @@ export default function RootLayout() {
               options={{ headerShown: false }}
             />
             <Stack.Screen name="kidstimer" options={{ headerShown: false }} />
+            <Stack.Screen name="kidsettings" options={{ headerShown: false }} />
           </Stack>
           <StatusBar style="auto" />
         </RewardsProvider>

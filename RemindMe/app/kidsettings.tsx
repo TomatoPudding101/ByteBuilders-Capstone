@@ -1,0 +1,587 @@
+import { useTheme } from "./ThemeContext";
+import { useUser } from "./userContext";
+
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+const KidSettings = () => {
+  const router = useRouter();
+  const { isDarkMode, toggleDarkMode, theme } = useTheme();
+  const [activeTab, setActiveTab] = useState<
+    "profile" | "preferences" | "accessibility"
+  >("profile");
+  const [fullName, setFullName] = useState("");
+  const [emailAddress, setEmailAddress] = useState("");
+  const { logout } = useUser();
+
+  return (
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: theme.background }]}
+      edges={["top", "left", "right"]}
+    >
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+
+      <LinearGradient
+        colors={
+          isDarkMode
+            ? ["#1f2937", "#1f2937"]
+            : ["#fff0f0", "#f0f4ff", "#f0fff4"]
+        }
+        style={StyleSheet.absoluteFill}
+      />
+
+      {/* Heading */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.push("/kidshome")}
+        >
+          <Ionicons name="arrow-back" size={24} color="#9333EA" />
+          <Text
+            style={[
+              styles.backText,
+              { backgroundColor: theme.background, color: theme.text },
+            ]}
+          >
+            Back to Dashboard
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Title */}
+      <View style={styles.titleContainer}>
+        <Text style={[styles.settingsLabel, { color: theme.text }]}>
+          settings
+        </Text>
+        <Text style={styles.pageTitle}>Account Settings</Text>
+      </View>
+
+      {/* Tabs */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === "profile" && styles.tabActive,
+            {
+              backgroundColor: theme.cardBackground,
+              borderColor: theme.border,
+            },
+          ]}
+          onPress={() => setActiveTab("profile")}
+        >
+          <Ionicons
+            name="person-outline"
+            size={18}
+            color={activeTab === "profile" ? "#9333EA" : "#666"}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "profile" && styles.tabTextActive,
+              { color: theme.text },
+            ]}
+          >
+            Profile
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === "preferences" && styles.tabActive,
+            {
+              backgroundColor: theme.cardBackground,
+              borderColor: theme.border,
+            },
+          ]}
+          onPress={() => setActiveTab("preferences")}
+        >
+          <Ionicons
+            name="settings-outline"
+            size={18}
+            color={activeTab === "preferences" ? "#9333EA" : "#666"}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "preferences" && styles.tabTextActive,
+              { color: theme.text },
+            ]}
+          >
+            Preferences
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === "accessibility" && styles.tabActive,
+            {
+              backgroundColor: theme.cardBackground,
+              borderColor: theme.border,
+            },
+          ]}
+          onPress={() => setActiveTab("accessibility")}
+        >
+          <MaterialCommunityIcons
+            name="account-voice"
+            size={18}
+            color={activeTab === "accessibility" ? "#9333EA" : "#666"}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "accessibility" && styles.tabTextActive,
+              { color: theme.text },
+            ]}
+          >
+            Accessibility
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {activeTab === "profile" && (
+          <>
+            {/* Profile Information */}
+            <View
+              style={[
+                styles.card,
+                {
+                  backgroundColor: theme.cardBackground,
+                  borderColor: theme.inputBorder,
+                },
+              ]}
+            >
+              <View style={styles.cardHeader}>
+                <Text style={[styles.cardTitle, { color: theme.text }]}>
+                  Profile Information
+                </Text>
+                <TouchableOpacity style={styles.editButton}>
+                  <Text style={styles.editButtonText}>Edit Profile</Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Update your personal details
+              </Text>
+
+              <View style={styles.inputGroup}>
+                <Text style={[styles.label, { color: theme.text }]}>
+                  Full Name
+                </Text>
+                <TextInput
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: theme.inputBackground,
+                      borderColor: theme.border,
+                    },
+                  ]}
+                  value={fullName}
+                  onChangeText={setFullName}
+                  placeholder="Enter your full name"
+                  placeholderTextColor="#95badf"
+                />
+              </View>
+
+              <View style={styles.inputGroup}>
+                <Text style={[styles.label, { color: theme.text }]}>
+                  Email Address
+                </Text>
+                <TextInput
+                  style={[
+                    styles.input,
+                    {
+                      backgroundColor: theme.inputBackground,
+                      borderColor: theme.border,
+                    },
+                  ]}
+                  value={emailAddress}
+                  onChangeText={setEmailAddress}
+                  placeholder="Enter your email address"
+                  placeholderTextColor="#95badf"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
+            </View>
+
+            {/* Account Actions */}
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                Account Actions
+              </Text>
+
+              <TouchableOpacity
+                style={[
+                  styles.signOutButton,
+                  {
+                    backgroundColor: theme.inputBackground,
+                    borderColor: theme.inputBorder,
+                  },
+                ]}
+                onPress={async () => {
+                  await logout();
+                  router.push("./kids-login");
+                }}
+              >
+                <Text style={[styles.signOutText, { color: theme.text }]}>
+                  Sign Out
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
+
+        {activeTab === "preferences" && (
+          <>
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                Notification Preferences
+              </Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Manage notification settings
+              </Text>
+
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Coming soon...
+              </Text>
+            </View>
+
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                App Preferences
+              </Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Customize your app experience
+              </Text>
+
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Coming soon...
+              </Text>
+            </View>
+          </>
+        )}
+
+        {activeTab === "accessibility" && (
+          <>
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                Accessibility Options
+              </Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Customize accessibility features
+              </Text>
+
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Coming soon...
+              </Text>
+            </View>
+
+            <View
+              style={[styles.card, { backgroundColor: theme.cardBackground }]}
+            >
+              <Text style={[styles.cardTitle, { color: theme.text }]}>
+                Display Settings
+              </Text>
+              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
+                Adjust text size and contrast
+              </Text>
+
+              <View style={[styles.settingRow, { borderColor: theme.border }]}>
+                <View style={styles.settingInfo}>
+                  <Text style={[styles.label, { color: theme.text }]}>
+                    Dark Mode
+                  </Text>
+                  <Text
+                    style={[
+                      styles.settingDescription,
+                      { color: theme.textTertiary },
+                    ]}
+                  >
+                    Enable dark theme
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={[
+                    styles.toggleButton,
+                    isDarkMode && styles.toggleButtonActive,
+                  ]}
+                  onPress={toggleDarkMode}
+                >
+                  <View
+                    style={[
+                      styles.toggleCircle,
+                      isDarkMode && styles.toggleCircleActive,
+                    ]}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>
+        )}
+
+        <View style={{ height: 100 }} />
+      </ScrollView>
+
+      {/* Bottom Navigation */}
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FDF4F5",
+  },
+
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+  },
+
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+
+  backText: {
+    flex: 1,
+    backgroundColor: "#FDF4F5",
+  },
+
+  titleContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+
+  settingsLabel: {
+    fontSize: 12,
+    color: "#999",
+    marginBottom: 4,
+  },
+
+  pageTitle: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#9333EA",
+  },
+
+  tabContainer: {
+    flexDirection: "row",
+    paddingHorizontal: 12,
+    gap: 6,
+    marginBottom: 20,
+  },
+
+  tab: {
+    flex: 1,
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    borderRadius: 8,
+    backgroundColor: "#FFF",
+  },
+
+  tabActive: {
+    backgroundColor: "#F3E8FF",
+  },
+
+  tabText: {
+    fontSize: 13,
+    color: "#666",
+    fontWeight: "500",
+    textAlign: "center",
+  },
+
+  tabTextActive: {
+    color: "#9333EA",
+    fontWeight: "600",
+  },
+
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+
+  card: {
+    backgroundColor: "#FFF",
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#333",
+    marginBottom: 4,
+  },
+
+  cardSubtitle: {
+    fontSize: 13,
+    color: "#9333EA",
+    marginBottom: 20,
+  },
+
+  editButton: {
+    backgroundColor: "#9333EA",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+
+  editButtonText: {
+    color: "#FFF",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+
+  inputGroup: {
+    marginBottom: 16,
+  },
+
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+    marginBottom: 8,
+  },
+
+  input: {
+    backgroundColor: "#F9FAFB",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    fontSize: 15,
+    color: "#333",
+  },
+
+  signOutButton: {
+    backgroundColor: "#FFF",
+    borderWidth: 2,
+    borderColor: "#9333EA",
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 12,
+  },
+
+  signOutText: {
+    color: "#9333EA",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+
+  bottomNav: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    paddingVertical: 16,
+    paddingBottom: 20,
+    backgroundColor: "#FFF",
+    borderTopWidth: 1,
+    borderTopColor: "#F3F4F6",
+  },
+
+  navItem: {
+    padding: 8,
+  },
+
+  settingRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#F3F4F6",
+    marginTop: 12,
+  },
+
+  settingInfo: {
+    flex: 1,
+  },
+
+  settingDescription: {
+    fontSize: 12,
+    marginTop: 4,
+  },
+
+  toggleButton: {
+    width: 51,
+    height: 31,
+    borderRadius: 16,
+    backgroundColor: "#D1D5DB",
+    padding: 2,
+    justifyContent: "center",
+  },
+
+  toggleButtonActive: {
+    backgroundColor: "#9333EA",
+  },
+
+  toggleCircle: {
+    width: 27,
+    height: 27,
+    borderRadius: 14,
+    backgroundColor: "#FFF",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+
+  toggleCircleActive: {
+    transform: [{ translateX: 20 }],
+  },
+});
+
+export default KidSettings;
