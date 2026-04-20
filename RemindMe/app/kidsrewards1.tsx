@@ -1,5 +1,6 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   Alert,
   ScrollView,
@@ -9,7 +10,8 @@ import {
   View,
 } from "react-native";
 
-import { useRewards } from "./rewardContext";
+const auth = require("@react-native-firebase/auth").default;
+const firestore = require("@react-native-firebase/firestore").default;
 
 const REWARDS = [
   {
@@ -80,8 +82,25 @@ const REWARDS = [
 
 export default function KidsRewards() {
   const router = useRouter();
-  const { getPoints } = useRewards();
-  const totalPoints = getPoints("kid1");
+  const [totalPoints, setTotalPoints] = useState(0);
+  const [kidName, setKidName] = useState("");
+
+  useEffect(() => {
+    const uid = auth().currentUser?.uid;
+    if (!uid) return;
+
+    const unsub = firestore()
+      .collection("kids")
+      .doc(uid)
+      .onSnapshot((doc: any) => {
+        if (doc.exists) {
+          setTotalPoints(doc.data()?.points ?? 0);
+          setKidName(doc.data()?.name ?? "");
+        }
+      });
+
+    return unsub;
+  }, []);
 
   const handleRedeem = (reward: (typeof REWARDS)[0]) => {
     if (totalPoints < reward.points) {
@@ -110,7 +129,9 @@ export default function KidsRewards() {
         </TouchableOpacity>
         <View>
           <Text style={styles.headerTitle}>My Rewards</Text>
-          <Text style={styles.headerSub}>Earn points, unlock rewards!</Text>
+          <Text style={styles.headerSub}>
+            {kidName ? `Hi ${kidName}! ` : ""}Earn points, unlock rewards!
+          </Text>
         </View>
       </View>
 

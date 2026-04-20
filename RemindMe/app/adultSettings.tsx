@@ -25,7 +25,24 @@ const AdultSettings = () => {
   >("profile");
   const [fullName, setFullName] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
-  const { children: kids, addPoints } = useRewards();
+  const { children: kids, addKid, removeKid, addPoints } = useRewards();
+  const [newKidName, setNewKidName] = useState("");
+  const [newKidPin, setNewKidNPin] = useState("");
+  const [addKidError, setAddKidError] = useState<string | null>(null);
+  const [addingKid, setAddingKid] = useState(false);
+
+  const handleAddKid = async () => {
+    setAddKidError(null);
+    setAddingKid(true);
+    const error = await addKid(newKidName, newKidPin);
+    setAddingKid(false);
+    if (error) {
+      setAddKidError(error);
+    } else {
+      setNewKidName("");
+      setNewKidNPin("");
+    }
+  };
 
   const { logout } = useUser();
 
@@ -357,9 +374,94 @@ const AdultSettings = () => {
                 Manage your children and their tasks
               </Text>
 
-              <Text style={[styles.cardSubtitle, { color: theme.text }]}>
-                Coming soon...
+              {kids.length === 0 && (
+                <Text style={{ color: "#aaa", fontSize: 13, marginBottom: 12 }}>
+                  No kids.
+                </Text>
+              )}
+              {kids.map((kid) => (
+                <View
+                  key={kid.id}
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    paddingVertical: 10,
+                    borderBottomWidth: 1,
+                    borderBottomColor: "#f3f4f6",
+                  }}
+                >
+                  <View>
+                    <Text style={[styles.label, { color: theme.text }]}>
+                      {kid.name}
+                    </Text>
+                    <Text style={{ fontSize: 12, color: "#888" }}>
+                      {kid.email}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => removeKid(kid.id)}
+                    style={{ padding: 6 }}
+                  >
+                    <Text style={{ color: "#dc2626", fontWeight: "700" }}>
+                      Remove
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+
+              <Text
+                style={[styles.label, { color: theme.text, marginTop: 16 }]}
+              >
+                Add a child
               </Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: theme.inputBackground,
+                    borderColor: theme.border,
+                    marginBottom: 10,
+                  },
+                ]}
+                placeholder="Child name"
+                placeholderTextColor="#95badf"
+                value={newKidName}
+                onChangeText={setNewKidName}
+              />
+              <TextInput
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: theme.inputBackground,
+                    borderColor: theme.border,
+                    marginBottom: 10,
+                  },
+                ]}
+                placeholder="5 digit PIN for login"
+                placeholderTextColor="#95badf"
+                value={newKidPin}
+                onChangeText={setNewKidNPin}
+                keyboardType="numeric"
+                maxLength={5}
+                secureTextEntry
+              />
+              {addKidError && (
+                <Text
+                  style={{ color: "#dc2626", fontSize: 13, marginBottom: 8 }}
+                >
+                  {addKidError}
+                </Text>
+              )}
+              <TouchableOpacity
+                style={[styles.editButton, { opacity: addingKid ? 0.6 : 1 }]}
+                onPress={handleAddKid}
+                disabled={addingKid}
+              >
+                <Text style={styles.editButtonText}>
+                  {addingKid ? "Creating..." : "Add Child"}
+                </Text>
+              </TouchableOpacity>
             </View>
 
             <View

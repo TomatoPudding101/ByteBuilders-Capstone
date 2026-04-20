@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const auth = require("@react-native-firebase/auth").default;
+const firestore = require("@react-native-firebase/firestore").default
 
 const PIN_LENGTH = 5;
 
@@ -25,20 +26,8 @@ const KEY_COLORS: Record<string, string> = {
 
 export default function KidsLogin() {
   const [pin, setPin] = useState<string[]>([]);
-  const [kidEmail, setKidEmail] = useState<string | null>(null);
-  const [kidName, setKidName] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    const loadSavedKid = async () => {
-      const savedEmail = await AsyncStorage.getItem("kidEmail");
-      const savedName = await AsyncStorage.getItem("kidName");
-      setKidEmail(savedEmail);
-      setKidName(savedName);
-    };
-    loadSavedKid();
-  }, []);
 
   const handleKey = (key: string) => {
     if (key === "⌫") {
@@ -54,22 +43,39 @@ export default function KidsLogin() {
     if (pin.length !== PIN_LENGTH)
       return Alert.alert("Enter your full 5-digit PIN");
 
-    setLoading(true);
-    try {
-      const pinString = pin.join("") + "0";
-      await auth().signInWithEmailAndPassword(kidEmail, pinString);
+    if (__DEV__ && pin.join("") === "00000") {
       router.push("./kidshome");
-    } catch (e: any) {
-      console.log("Kids login error:", e.code);
-      if (
-        e.code === "auth/wrong-password" ||
-        e.code === "auth/invalid-credential"
-      ) {
-        Alert.alert("Wrong PIN!", "Try again.");
-        setPin([]);
-      } else {
-        Alert.alert("Oops!", "Something went wrong. Please try again.");
+      return;
+    }
+
+    setLoading(true);
+    const pinString = pin.join("") + "0";
+
+    try {
+      const snap = await firestore().collection("kids").get();
+      let loggedIn = false;
+
+      for (const doc of snap.docs) {
+        const email = doc.data().email;
+        try {
+          await auth().signInWithEmailAndPassword(email, pinString);
+          await AsyncStorage.setItem("kidEmail", email);
+          await AsyncStorage.setItem("kidName", doc.data().name);
+          loggedIn = true;
+          break;
+        } catch {
+          continue;
+        }
       }
+
+      if (loggedIn) {
+        router.push("./kidshome");
+      } else {
+        Alert.alert("Wrong PIN!", "Try again.")
+        setPin([]);
+      }
+    } catch (e) {
+      Alert.alert("Oops!", "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -82,9 +88,6 @@ export default function KidsLogin() {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-      {kidName && (
-        <Text style={styles.welcomeText}> Welcome back, {kidName}! </Text>
-      )}
       {/* PIN Display Box */}
       <View style={styles.pinBox}>
         <Text style={styles.pinTitle}>Enter Your Pin</Text>
