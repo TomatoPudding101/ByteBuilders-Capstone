@@ -47,7 +47,7 @@ export default function KidsProgress() {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const kidUid = auth().currentUser?.uid;
+  const kidUid = Platform.OS !== "web" ? auth().currentUser?.uid : null;
 
   useEffect(() => {
     if (!kidUid) return;

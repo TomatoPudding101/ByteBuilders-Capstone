@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { Platform } from "react-native";
 import { useUser } from "./userContext";
 
 const firestore = require("@react-native-firebase/firestore").default;
@@ -25,6 +26,7 @@ export function RewardsProvider({
   const [kids, setKids] = useState<Child[]>([]);
 
   useEffect(() => {
+    if (Platform.OS === "web") return;
     if (!currentUserId) return;
 
     const unsub = firestore()

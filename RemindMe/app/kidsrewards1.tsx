@@ -1,8 +1,10 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+
 import {
   Alert,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -86,6 +88,7 @@ export default function KidsRewards() {
   const [kidName, setKidName] = useState("");
 
   useEffect(() => {
+    if (Platform.OS === "web") return;
     const uid = auth().currentUser?.uid;
     if (!uid) return;
 
