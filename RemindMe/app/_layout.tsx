@@ -1,76 +1,45 @@
 import { ThemeProvider } from "./ThemeContext";
 import { UserProvider } from "./userContext";
-
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { RewardsProvider } from "./rewardContext";
+import { AppProvider } from "../context/AppContext";
 
 export default function RootLayout() {
   return (
-    <UserProvider>
-      <ThemeProvider>
-        <RewardsProvider>
-          <Stack>
-            <Stack.Screen
-              name="modal"
-              options={{ presentation: "modal", title: "Modal" }}
-            />
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="login" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="create-account"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="adultDashboard"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="adultSettings"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="progressjourney"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="adultfocustimer"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="adultcalender"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="kids-login" options={{ headerShown: false }} />
-            <Stack.Screen name="kidshome" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="kidsforgot-password"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="kidsregister"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="kidsgoals" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="kidscalendar"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="kidsprogress1"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="kidsrewards1"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="kidstimer" options={{ headerShown: false }} />
-            <Stack.Screen name="kidsettings" options={{ headerShown: false }} />
-          </Stack>
-          <StatusBar style="auto" />
-        </RewardsProvider>
-      </ThemeProvider>
-    </UserProvider>
+    <AppProvider>
+      <UserProvider>
+        <ThemeProvider>
+          <RewardsProvider>
+            <Stack>
+              <Stack.Screen name="modal" options={{ presentation: "modal", title: "Modal" }} />
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen name="login" options={{ headerShown: false }} />
+              <Stack.Screen name="create-account" options={{ headerShown: false }} />
+              <Stack.Screen name="adultDashboard" options={{ headerShown: false }} />
+              <Stack.Screen name="adultSettings" options={{ headerShown: false }} />
+              <Stack.Screen name="progressjourney" options={{ headerShown: false }} />
+              <Stack.Screen name="adultfocustimer" options={{ headerShown: false }} />
+              <Stack.Screen name="adultcalender" options={{ headerShown: false }} />
+              <Stack.Screen name="kids-login" options={{ headerShown: false }} />
+              <Stack.Screen name="kidshome" options={{ headerShown: false }} />
+              <Stack.Screen name="kidsforgot-password" options={{ headerShown: false }} />
+              <Stack.Screen name="kidsregister" options={{ headerShown: false }} />
+              <Stack.Screen name="kidsgoals" options={{ headerShown: false }} />
+              <Stack.Screen name="kidscalendar" options={{ headerShown: false }} />
+              <Stack.Screen name="kidsprogress1" options={{ headerShown: false }} />
+              <Stack.Screen name="kidsrewards1" options={{ headerShown: false }} />
+              <Stack.Screen name="kidstimer" options={{ headerShown: false }} />
+              <Stack.Screen name="kidsettings" options={{ headerShown: false }} />
+              <Stack.Screen name="parentlogin" options={{ headerShown: false }} />
+              <Stack.Screen name="parentsettings" options={{ headerShown: false }} />
+              <Stack.Screen name="parentforgotpassword" options={{ headerShown: false }} />
+            </Stack>
+            <StatusBar style="auto" />
+          </RewardsProvider>
+        </ThemeProvider>
+      </UserProvider>
+    </AppProvider>
   );
 }
