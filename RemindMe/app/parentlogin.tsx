@@ -1,27 +1,29 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
-const PARENT_EMAIL = 'parent@remindme.com';
-const PARENT_PASSWORD = 'parent123';
+const PARENT_USER_ID = 'devuser';
+const PARENT_PASSWORD = 'devuser';
 
 export default function ParentLogin() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
 
   const handleLogin = () => {
-    if (!email || !password) {
-      Alert.alert('Please fill in all fields.');
+    setError('');
+    if (!userId || !password) {
+      setError('Please fill in all fields.');
       return;
     }
-    if (email.toLowerCase() === PARENT_EMAIL && password === PARENT_PASSWORD) {
+    if (userId === PARENT_USER_ID && password === PARENT_PASSWORD) {
       router.push('/parentsettings');
     } else {
-      Alert.alert('Incorrect email or password. Please try again.');
+      setError('Incorrect User ID or password. Please try again.');
     }
   };
 
@@ -39,18 +41,17 @@ export default function ParentLogin() {
       <Text style={styles.title}>Parent/Guardian{'\n'}Login</Text>
 
       <View style={styles.card}>
-        <Text style={styles.label}>Enter Email:</Text>
+        <Text style={styles.label}>Parent User ID:</Text>
         <TextInput
           style={styles.input}
-          value={email}
-          onChangeText={setEmail}
+          value={userId}
+          onChangeText={setUserId}
           placeholder="---"
           placeholderTextColor="#bbb"
-          keyboardType="email-address"
           autoCapitalize="none"
         />
 
-        <Text style={styles.label}>Enter Password:</Text>
+        <Text style={styles.label}>Password:</Text>
         <View style={styles.passwordRow}>
           <TextInput
             style={[styles.input, { flex: 1 }]}
@@ -72,6 +73,8 @@ export default function ParentLogin() {
         <TouchableOpacity style={styles.forgotBtn} onPress={() => router.push('/parentforgotpassword')}>
           <Text style={styles.forgotText}>Forgot Password?</Text>
         </TouchableOpacity>
+
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
       </View>
 
       <TouchableOpacity style={styles.loginArrow} onPress={handleLogin}>
@@ -139,6 +142,12 @@ const styles = StyleSheet.create({
     color: '#555',
     fontWeight: '600',
     textDecorationLine: 'underline',
+  },
+  errorText: {
+    color: '#d44',
+    fontSize: 13,
+    textAlign: 'center',
+    fontWeight: '600',
   },
   loginArrow: {
     width: 120,

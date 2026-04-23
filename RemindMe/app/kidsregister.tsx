@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,11 +17,18 @@ const auth = require("@react-native-firebase/auth").default;
 const firestore = require("@react-native-firebase/firestore").default;
 
 const NAME_TAGS = [
-  { id: "penguin", emoji: "🐧" },
-  { id: "bunny", emoji: "🐰" },
-  { id: "bear", emoji: "🐻" },
-  { id: "cat", emoji: "🐱" },
+  { id: "bunny", label: "Bunny" },
+  { id: "bear", label: "Bear" },
+  { id: "cat", label: "Cat" },
+  { id: "penguin", label: "Penguin" },
 ];
+
+const CHARACTER_CROP: Record<string, { marginLeft: number; marginTop: number }> = {
+  bunny:   { marginLeft: 0,    marginTop: 0 },
+  bear:    { marginLeft: -110, marginTop: 0 },
+  cat:     { marginLeft: 0,    marginTop: -110 },
+  penguin: { marginLeft: -110, marginTop: -110 },
+};
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -33,37 +41,34 @@ export default function Register() {
     if (!name.trim()) return Alert.alert("Oops!", "Please enter your name");
     if (pin.length !== 5)
       return Alert.alert("Oops!", "Your PIN must be exactly 5 numbers");
-    if (!selectedTag) return Alert.alert("Oops!", "Please pick a name tag.");
+    if (!selectedTag) return Alert.alert("Oops!", "Please pick a character.");
 
     setLoading(true);
     try {
-      const kidEmail = `kid${Date.now()}@remindme.app`;
-
-      const firebasePin = pin + "0";
-      const result = await auth().createUserWithEmailAndPassword(
-        kidEmail,
-        firebasePin,
-      );
-
-      await firestore().collection("kids").doc(result.user.uid).set({
-        name: name.trim(),
-        nametag: selectedTag,
-        points: 0,
-        createdAt: firestore.FieldValue.serverTimestamp(),
-      });
-
-      await AsyncStorage.setItem("kidEmail", kidEmail);
+      // Save name and character locally so dashboard updates immediately
       await AsyncStorage.setItem("kidName", name.trim());
+      await AsyncStorage.setItem("kidCharacter", selectedTag);
 
-      Alert.alert("Account created!", `Welcome, ${name}! 🎉`);
-      router.push("./kids-login");
-    } catch (e: any) {
-      console.log("Error:", e.code, e.message);
-      if (e.code === "auth/email-already-in-use") {
-        Alert.alert("Oops!", "An account with that name already exists.");
-      } else {
-        Alert.alert("Oops!", "Something went wrong. Please try again");
+      // Try Firebase — skip gracefully if unavailable
+      try {
+        const kidEmail = `kid${Date.now()}@remindme.app`;
+        const firebasePin = pin + "0";
+        const result = await auth().createUserWithEmailAndPassword(kidEmail, firebasePin);
+        await firestore().collection("kids").doc(result.user.uid).set({
+          name: name.trim(),
+          nametag: selectedTag,
+          points: 0,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        });
+        await AsyncStorage.setItem("kidEmail", kidEmail);
+      } catch (firebaseErr) {
+        console.log("Firebase unavailable, saving locally only:", firebaseErr);
       }
+
+      Alert.alert("Saved!", `Welcome, ${name}! 🎉`);
+      router.push("./kidshome");
+    } catch (e: any) {
+      Alert.alert("Oops!", "Something went wrong. Please try again");
     } finally {
       setLoading(false);
     }
@@ -83,7 +88,6 @@ export default function Register() {
         <Text style={styles.title}>Create Account</Text>
 
         <View style={styles.card}>
-          {/* Name */}
           <Text style={styles.label}>Enter Name</Text>
           <TextInput
             style={styles.input}
@@ -93,7 +97,6 @@ export default function Register() {
             placeholderTextColor="#aaa"
           />
 
-          {/* PIN */}
           <Text style={styles.label}>Create 5 number pincode</Text>
           <TextInput
             style={styles.input}
@@ -106,47 +109,44 @@ export default function Register() {
             secureTextEntry
           />
 
-          {/*
-          <Text style={styles.label}>Enter Parent/Supervisor{"\n"}Email</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            placeholder="---"
-            placeholderTextColor="#aaa"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-          */}
+          <Text style={styles.label}>Select Your Character</Text>
+          <Text style={styles.sublabel}>Tap a character to choose your name tag!</Text>
 
-          {/* Name Tag Selector */}
-          <Text style={styles.label}>Select Name Tag</Text>
-          <View style={styles.tagGrid}>
-            {NAME_TAGS.map((tag) => (
-              <TouchableOpacity
-                key={tag.id}
-                style={[
-                  styles.tagItem,
-                  selectedTag === tag.id && styles.tagSelected,
-                ]}
-                onPress={() => setSelectedTag(tag.id)}
-              >
-                <Text style={styles.tagEmoji}>{tag.emoji}</Text>
-                <View
+          <View style={styles.charGrid}>
+            {NAME_TAGS.map((tag) => {
+              const crop = CHARACTER_CROP[tag.id];
+              return (
+                <TouchableOpacity
+                  key={tag.id}
                   style={[
-                    styles.tagNameBox,
-                    {
-                      borderColor: selectedTag === tag.id ? "#5bbfb0" : "#ddd",
-                    },
+                    styles.charTile,
+                    selectedTag === tag.id && styles.charTileSelected,
                   ]}
-                />
-              </TouchableOpacity>
-            ))}
+                  onPress={() => setSelectedTag(tag.id)}
+                >
+                  <View style={styles.imageClip}>
+                    <Image
+                      source={require("../assets/images/animalschar.png")}
+                      style={[styles.charImage, { marginLeft: crop.marginLeft, marginTop: crop.marginTop }]}
+                    />
+                  </View>
+                  <Text style={[
+                    styles.charLabel,
+                    selectedTag === tag.id && styles.charLabelSelected,
+                  ]}>
+                    {tag.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
 
-        {/* Save Button */}
-        <TouchableOpacity onPress={handleSave} disabled={loading}>
+        <TouchableOpacity
+          style={styles.saveBtn}
+          onPress={handleSave}
+          disabled={loading}
+        >
           <Text style={[styles.saveText, loading && { opacity: 0.5 }]}>
             {loading ? "Saving..." : "Save"}
           </Text>
@@ -183,6 +183,11 @@ const styles = StyleSheet.create({
     color: "#333",
     marginTop: 10,
   },
+  sublabel: {
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 4,
+  },
   input: {
     backgroundColor: "rgba(255,255,255,0.75)",
     borderRadius: 12,
@@ -191,36 +196,48 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#333",
   },
-  tagGrid: {
+  charGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
-    marginTop: 8,
-    backgroundColor: "rgba(240,230,230,0.6)",
-    borderRadius: 14,
-    padding: 12,
+    gap: 10,
     justifyContent: "center",
+    marginTop: 8,
   },
-  tagItem: {
+  charTile: {
     alignItems: "center",
-    padding: 8,
-    borderRadius: 12,
-    borderWidth: 2,
+    borderRadius: 14,
+    borderWidth: 2.5,
     borderColor: "transparent",
+    padding: 6,
+    backgroundColor: "rgba(255,255,255,0.5)",
+    gap: 4,
   },
-  tagSelected: {
+  charTileSelected: {
     borderColor: "#5bbfb0",
     backgroundColor: "rgba(91,191,176,0.15)",
   },
-  tagEmoji: {
-    fontSize: 40,
+  imageClip: {
+    width: 100,
+    height: 100,
+    overflow: "hidden",
+    borderRadius: 10,
   },
-  tagNameBox: {
-    width: 60,
-    height: 18,
-    borderWidth: 2,
-    borderRadius: 4,
-    marginTop: 4,
+  charImage: {
+    width: 220,
+    height: 220,
+  },
+  charLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#555",
+  },
+  charLabelSelected: {
+    color: "#5bbfb0",
+    fontWeight: "700",
+  },
+  saveBtn: {
+    paddingVertical: 10,
+    paddingHorizontal: 40,
   },
   saveText: {
     fontSize: 32,

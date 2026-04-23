@@ -30,7 +30,7 @@ export default function ParentForgotPassword() {
       <Text style={styles.title}>Forgot{'\n'}Password?</Text>
 
       <View style={styles.card}>
-        <Text style={styles.label}>Enter Parent/Supervisor{'\n'}Email</Text>
+        <Text style={styles.label}>Enter Parent/Guardian{'\n'}Email</Text>
         <TextInput
           style={styles.input}
           value={email}

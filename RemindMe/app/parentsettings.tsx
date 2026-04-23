@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet,
-  ScrollView, TextInput, Switch, Alert, Pressable
+  ScrollView, TextInput, Switch, Pressable
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -20,28 +20,25 @@ export default function ParentSettings() {
   const [soundEffects, setSoundEffects] = useState(true);
   const [timerReminders, setTimerReminders] = useState(true);
   const [goalReminders, setGoalReminders] = useState(true);
+  const [saveConfirm, setSaveConfirm] = useState(false);
 
   const handleAddGoal = () => {
-    if (!newGoalText.trim()) {
-      Alert.alert('Please enter a goal or chore name.');
-      return;
-    }
+    if (!newGoalText.trim()) return;
     addGoal({ text: newGoalText.trim(), type: newGoalType, points: 5 });
     setNewGoalText('');
   };
 
-  const handleRemove = (id: string, text: string) => {
-    Alert.alert('Remove Goal', `Remove "${text}"?`, [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Remove', style: 'destructive', onPress: () => removeGoal(id) },
-    ]);
+  const handleRemove = (id: string) => {
+    removeGoal(id);
   };
 
   const handleSignOut = () => {
-    Alert.alert('Sign Out', 'Are you sure?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign Out', style: 'destructive', onPress: () => router.replace('/kidshome') },
-    ]);
+    router.replace('/kidshome');
+  };
+
+  const handleSave = () => {
+    setSaveConfirm(true);
+    setTimeout(() => setSaveConfirm(false), 2000);
   };
 
   const notificationSettings = [
@@ -130,7 +127,7 @@ export default function ParentSettings() {
               {goals.filter(g => g.type === 'chore').map(g => (
                 <View key={g.id} style={styles.goalItem}>
                   <Text style={styles.goalItemText}>{g.text}</Text>
-                  <Pressable style={styles.removeBtn} onPress={() => handleRemove(g.id, g.text)}>
+                  <Pressable style={styles.removeBtn} onPress={() => handleRemove(g.id)}>
                     <Text style={styles.removeBtnText}>✕</Text>
                   </Pressable>
                 </View>
@@ -145,7 +142,7 @@ export default function ParentSettings() {
               {goals.filter(g => g.type === 'goal').map(g => (
                 <View key={g.id} style={styles.goalItem}>
                   <Text style={styles.goalItemText}>{g.text}</Text>
-                  <Pressable style={styles.removeBtn} onPress={() => handleRemove(g.id, g.text)}>
+                  <Pressable style={styles.removeBtn} onPress={() => handleRemove(g.id)}>
                     <Text style={styles.removeBtnText}>✕</Text>
                   </Pressable>
                 </View>
@@ -192,8 +189,8 @@ export default function ParentSettings() {
           </View>
         )}
 
-        <TouchableOpacity onPress={() => Alert.alert('Saved!', 'Settings have been saved.')}>
-          <Text style={styles.saveText}>Save</Text>
+        <TouchableOpacity onPress={handleSave}>
+          <Text style={styles.saveText}>{saveConfirm ? '✓ Saved!' : 'Save'}</Text>
         </TouchableOpacity>
 
         <View style={{ height: 40 }} />
