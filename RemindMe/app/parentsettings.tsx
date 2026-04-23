@@ -301,7 +301,7 @@ export default function ParentSettings() {
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
                 <Text style={styles.settingLabel}>Dark Mode</Text>
-                <Text style={styles.settingDesc}>Coming soon!</Text>{" "}
+                <Text style={styles.settingDesc}>Coming soon!</Text>
               </View>
               <Switch
                 value={darkMode}
