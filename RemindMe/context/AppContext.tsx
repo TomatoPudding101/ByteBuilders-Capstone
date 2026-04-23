@@ -20,6 +20,7 @@ type AppState = {
   addGoal: (goal: Omit<Goal, 'id'>) => void;
   removeGoal: (id: string) => void;
   toggleCheck: (goalId: string, day: number) => void;
+  deductPoints: (pts: number) => void;
   pendingPoints: number | null;
   clearPendingPoints: () => void;
 };
@@ -74,12 +75,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const deductPoints = (pts: number) => {
+    setTotalPoints(prev => Math.max(0, prev - pts));
+  };
+
   const clearPendingPoints = () => setPendingPoints(null);
 
   return (
     <AppContext.Provider value={{
       goals, checked, totalPoints, goalsCompleted, streak,
       addGoal, removeGoal, toggleCheck,
+      deductPoints,
       pendingPoints, clearPendingPoints,
     }}>
       {children}

@@ -203,7 +203,10 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   scroll: { paddingTop: 0 },
   bannerImage: { width: '100%', height: 118, marginBottom: 8 },
-  inner: { paddingHorizontal: 12 },
+  inner: {
+    paddingHorizontal: 12,
+    flex: 1,
+  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -245,15 +248,20 @@ const styles = StyleSheet.create({
   editLabel: { fontSize: 11, color: '#5bbfb0', fontWeight: '700' },
 
   // Dashboard grid — bigger images, centered
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'space-between' },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    justifyContent: 'space-between',
+    flex: 1,
+  },
   tile: {
     width: '47%',
-    height: 150,
+    height: 160,
     borderRadius: 22,
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: 16,
-    paddingBottom: 10,
+    justifyContent: 'center',
+    gap: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.18,
@@ -261,7 +269,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   tileImage: {
-    width: '85%',
+    width: 90,
     height: 90,
   },
   tileLabel: {
@@ -270,7 +278,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
     lineHeight: 16,
-    marginTop: 4,
   },
 
   // Modal
