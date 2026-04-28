@@ -2,12 +2,14 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-nati
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useAppState } from '../context/AppContext';
+import { useTheme } from './ThemeContext';
 
 const STREAK_DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
 export default function KidsProgress() {
   const router = useRouter();
   const { totalPoints, goalsCompleted, streak, goals, checked } = useAppState();
+  const { isDarkMode, theme } = useTheme();
 
   const totalTasks = goals.length * 7;
   const completedCount = Object.values(checked).reduce((acc, days) => {
@@ -23,19 +25,29 @@ export default function KidsProgress() {
     { label: 'Total Points',     value: `${totalPoints}`,    color: '#d4a020' },
   ];
 
+  const gradientColors: [string, string, string, string] = isDarkMode
+    ? ['#0f0f1a', '#1a1035', '#150d2e', '#0f0f1a']
+    : ['#fde8d0', '#f8c8d4', '#d4c8f0', '#c8e0f0'];
+
+  const cardBg = isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.75)';
+  const backBtnBg = isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.5)';
+
   return (
     <LinearGradient
-      colors={['#fde8d0', '#f8c8d4', '#d4c8f0', '#c8e0f0']}
+      colors={gradientColors}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-          <Text style={styles.backText}>←</Text>
+        <TouchableOpacity
+          style={[styles.backBtn, { backgroundColor: backBtnBg }]}
+          onPress={() => router.back()}
+        >
+          <Text style={[styles.backText, { color: theme.text }]}>←</Text>
         </TouchableOpacity>
         <View>
-          <Text style={styles.headerTitle}>My Progress</Text>
+          <Text style={[styles.headerTitle, { color: theme.text }]}>My Progress</Text>
           <Text style={styles.headerSub}>Keep up the Good Work!</Text>
         </View>
       </View>
@@ -43,30 +55,32 @@ export default function KidsProgress() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
         <View style={styles.summaryRow}>
-          <View style={[styles.summaryCard, { backgroundColor: '#e8d5f8' }]}>
+          <View style={[styles.summaryCard, { backgroundColor: isDarkMode ? '#2d1f4e' : '#e8d5f8' }]}>
             <Text style={[styles.summaryValue, { color: '#7040b0' }]}>{totalPoints}</Text>
-            <Text style={[styles.summaryLabel, { color: '#9060c0' }]}>Total Points</Text>
+            <Text style={[styles.summaryLabel, { color: isDarkMode ? '#c0a8f0' : '#9060c0' }]}>Total Points</Text>
           </View>
-          <View style={[styles.summaryCard, { backgroundColor: '#d5f0e8' }]}>
+          <View style={[styles.summaryCard, { backgroundColor: isDarkMode ? '#1a3d2e' : '#d5f0e8' }]}>
             <Text style={[styles.summaryValue, { color: '#208060' }]}>{streak}</Text>
-            <Text style={[styles.summaryLabel, { color: '#308070' }]}>Day Streak</Text>
+            <Text style={[styles.summaryLabel, { color: isDarkMode ? '#60c090' : '#308070' }]}>Day Streak</Text>
           </View>
-          <View style={[styles.summaryCard, { backgroundColor: '#d5e8f8' }]}>
+          <View style={[styles.summaryCard, { backgroundColor: isDarkMode ? '#1a2a4a' : '#d5e8f8' }]}>
             <Text style={[styles.summaryValue, { color: '#205090' }]}>{goalsCompleted}</Text>
-            <Text style={[styles.summaryLabel, { color: '#306080' }]}>Goals Done</Text>
+            <Text style={[styles.summaryLabel, { color: isDarkMode ? '#6090c0' : '#306080' }]}>Goals Done</Text>
           </View>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Today's Progress</Text>
+        <View style={[styles.card, { backgroundColor: cardBg }]}>
+          <Text style={[styles.cardTitle, { color: theme.text }]}>Today's Progress</Text>
           <View style={styles.progressBarBg}>
             <View style={[styles.progressBarFill, { width: `${Math.max(progressPct, 2)}%` }]} />
           </View>
-          <Text style={styles.progressLabel}>{progressPct}% Complete</Text>
+          <Text style={[styles.progressLabel, { color: isDarkMode ? '#b0a8d0' : '#888' }]}>
+            {progressPct}% Complete
+          </Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Day Streak</Text>
+        <View style={[styles.card, { backgroundColor: cardBg }]}>
+          <Text style={[styles.cardTitle, { color: theme.text }]}>Day Streak</Text>
           <View style={styles.streakRow}>
             {STREAK_DAYS.map((d, i) => (
               <View key={i} style={[styles.streakDay, i < streak && styles.streakDayActive]}>
@@ -74,18 +88,25 @@ export default function KidsProgress() {
               </View>
             ))}
           </View>
-          <Text style={styles.streakMsg}>
+          <Text style={[styles.streakMsg, { color: isDarkMode ? '#b0a8d0' : '#888' }]}>
             {streak === 0 ? 'Start your streak today!' : `Amazing! ${streak} day streak!`}
           </Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>My Stats</Text>
+        <View style={[styles.card, { backgroundColor: cardBg }]}>
+          <Text style={[styles.cardTitle, { color: theme.text }]}>My Stats</Text>
           <View style={styles.statsGrid}>
             {stats.map((s, i) => (
-              <View key={i} style={[styles.statCard, { borderTopColor: s.color, borderTopWidth: 3 }]}>
+              <View
+                key={i}
+                style={[
+                  styles.statCard,
+                  { borderTopColor: s.color, borderTopWidth: 3 },
+                  { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.9)' },
+                ]}
+              >
                 <Text style={[styles.statValue, { color: s.color }]}>{s.value}</Text>
-                <Text style={styles.statLabel}>{s.label}</Text>
+                <Text style={[styles.statLabel, { color: isDarkMode ? '#b0a8d0' : '#888' }]}>{s.label}</Text>
               </View>
             ))}
           </View>
@@ -108,15 +129,14 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   backBtn: {
-    backgroundColor: 'rgba(255,255,255,0.5)',
     borderRadius: 20,
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backText: { fontSize: 20, color: '#555' },
-  headerTitle: { fontSize: 24, fontWeight: 'bold', color: '#333' },
+  backText: { fontSize: 20 },
+  headerTitle: { fontSize: 24, fontWeight: 'bold' },
   headerSub: { fontSize: 13, fontWeight: '600', color: '#e06080' },
   scroll: { paddingHorizontal: 16 },
   summaryRow: { flexDirection: 'row', gap: 10, marginBottom: 14 },
@@ -124,12 +144,11 @@ const styles = StyleSheet.create({
   summaryValue: { fontSize: 28, fontWeight: 'bold' },
   summaryLabel: { fontSize: 11, fontWeight: '600', textAlign: 'center', marginTop: 2 },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.75)',
     borderRadius: 18,
     padding: 16,
     marginBottom: 14,
   },
-  cardTitle: { fontSize: 16, fontWeight: 'bold', color: '#444', marginBottom: 12 },
+  cardTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 12 },
   progressBarBg: {
     height: 20,
     backgroundColor: 'rgba(180,180,220,0.3)',
@@ -137,7 +156,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   progressBarFill: { height: '100%', backgroundColor: '#8b6fd4', borderRadius: 10 },
-  progressLabel: { fontSize: 13, color: '#888', textAlign: 'right', marginTop: 6 },
+  progressLabel: { fontSize: 13, textAlign: 'right', marginTop: 6 },
   streakRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
   streakDay: {
     width: 38,
@@ -150,7 +169,7 @@ const styles = StyleSheet.create({
   streakDayActive: { backgroundColor: '#f0a030' },
   streakDayText: { fontSize: 13, fontWeight: '700', color: '#aaa' },
   streakDayTextActive: { color: '#fff' },
-  streakMsg: { fontSize: 13, color: '#888', textAlign: 'center' },
+  streakMsg: { fontSize: 13, textAlign: 'center' },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -159,7 +178,6 @@ const styles = StyleSheet.create({
   },
   statCard: {
     width: '47%',
-    backgroundColor: 'rgba(255,255,255,0.9)',
     borderRadius: 12,
     padding: 14,
     alignItems: 'center',
@@ -170,5 +188,5 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   statValue: { fontSize: 28, fontWeight: 'bold' },
-  statLabel: { fontSize: 11, color: '#888', textAlign: 'center', marginTop: 4 },
+  statLabel: { fontSize: 11, textAlign: 'center', marginTop: 4 },
 });

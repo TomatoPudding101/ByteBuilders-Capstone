@@ -36,7 +36,7 @@ const KidSettings = () => {
       <LinearGradient
         colors={
           isDarkMode
-            ? ["#1f2937", "#1f2937"]
+            ? ["#0f0f1a", "#1a1035"]
             : ["#fff0f0", "#f0f4ff", "#f0fff4"]
         }
         style={StyleSheet.absoluteFill}

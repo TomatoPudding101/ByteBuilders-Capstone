@@ -54,15 +54,15 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const theme = {
-    background: isDarkMode ? "#1F2937" : "#FDF4F5",
-    cardBackground: isDarkMode ? "#374151" : "#FFF",
-    text: isDarkMode ? "#95badf" : "#333",
-    textSecondary: isDarkMode ? "#D1D5DB" : "#666",
-    textTertiary: isDarkMode ? "#9CA3AF" : "#999",
+    background: isDarkMode ? "#0f0f1a" : "#FDF4F5",
+    cardBackground: isDarkMode ? "rgba(255,255,255,0.10)" : "#FFF",
+    text: isDarkMode ? "#ffffff" : "#333",
+    textSecondary: isDarkMode ? "#e0d8f0" : "#666",
+    textTertiary: isDarkMode ? "#b0a8d0" : "#999",
     primary: "#9333EA",
-    inputBackground: isDarkMode ? "#4B5563" : "#F9FAFB",
-    inputBorder: isDarkMode ? "#6B7280" : "#E5E7EB",
-    border: isDarkMode ? "#4B5563" : "#F3F4F6",
+    inputBackground: isDarkMode ? "rgba(255,255,255,0.12)" : "#F9FAFB",
+    inputBorder: isDarkMode ? "rgba(255,255,255,0.20)" : "#E5E7EB",
+    border: isDarkMode ? "rgba(255,255,255,0.12)" : "#F3F4F6",
   };
 
   return (

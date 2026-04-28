@@ -6,6 +6,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useAppState } from '../context/AppContext';
+import { useTheme } from './ThemeContext';
 import CelebrationBanner from '../components/CelebrationBanner';
 
 const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -13,6 +14,7 @@ const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 export default function GoalsTrackerScreen() {
   const router = useRouter();
   const { goals, checked, toggleCheck, pendingPoints, clearPendingPoints } = useAppState();
+  const { isDarkMode, theme } = useTheme();
   const [notes, setNotes] = useState('• ');
 
   const chores = goals.filter(g => g.type === 'chore');
@@ -34,27 +36,37 @@ export default function GoalsTrackerScreen() {
     }
   };
 
+  const gradientColors: [string, string, string, string] = isDarkMode
+    ? ['#0f0f1a', '#1a1035', '#150d2e', '#0f0f1a']
+    : ['#fde8d0', '#f8c8d4', '#d4c8f0', '#c8e0f0'];
+
+  const cardBg = isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.75)';
+  const backBtnBg = isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.5)';
+
   return (
     <View style={{ flex: 1 }}>
       <LinearGradient
-        colors={['#fde8d0', '#f8c8d4', '#d4c8f0', '#c8e0f0']}
+        colors={gradientColors}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.container}
       >
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-            <Text style={styles.backText}>←</Text>
+          <TouchableOpacity
+            style={[styles.backBtn, { backgroundColor: backBtnBg }]}
+            onPress={() => router.back()}
+          >
+            <Text style={[styles.backText, { color: theme.text }]}>←</Text>
           </TouchableOpacity>
           <View style={styles.headerTextArea}>
-            <Text style={styles.headerTitle}>Goals / Chores</Text>
+            <Text style={[styles.headerTitle, { color: theme.text }]}>Goals / Chores</Text>
             <Text style={styles.headerSub}>One Step at a Time!</Text>
           </View>
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: cardBg }]}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Daily Chores</Text>
               <View style={styles.dayRow}>
@@ -64,19 +76,25 @@ export default function GoalsTrackerScreen() {
               </View>
             </View>
             {chores.length === 0 && (
-              <Text style={styles.emptyMsg}>No chores yet! Ask a parent to add some.</Text>
+              <Text style={[styles.emptyMsg, { color: isDarkMode ? '#b0a8d0' : '#bbb' }]}>
+                No chores yet! Ask a parent to add some.
+              </Text>
             )}
             {chores.map((chore, ri) => (
               <View key={chore.id} style={styles.choreRow}>
-                <Text style={styles.choreNum}>{ri + 1}.</Text>
-                <Text style={styles.choreText}>{chore.text}</Text>
+                <Text style={[styles.choreNum, { color: isDarkMode ? '#b0a8d0' : '#666' }]}>{ri + 1}.</Text>
+                <Text style={[styles.choreText, { color: theme.text }]}>{chore.text}</Text>
                 <View style={styles.checkRow}>
                   {DAYS.map((_, ci) => {
                     const isChecked = checked[chore.id]?.[ci] ?? false;
                     return (
                       <Pressable
                         key={ci}
-                        style={[styles.checkbox, isChecked && styles.checkboxChecked]}
+                        style={[
+                          styles.checkbox,
+                          { borderColor: isDarkMode ? '#6060a0' : '#aaa' },
+                          isChecked && styles.checkboxChecked,
+                        ]}
                         onPress={() => toggleCheck(chore.id, ci)}
                       >
                         {isChecked && <Text style={styles.checkmark}>✓</Text>}
@@ -88,12 +106,14 @@ export default function GoalsTrackerScreen() {
             ))}
           </View>
 
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: cardBg }]}>
             <View style={styles.weeklyHeader}>
               <Text style={styles.sectionTitle}>Weekly Goals</Text>
             </View>
             {weeklyGoals.length === 0 && (
-              <Text style={styles.emptyMsg}>No goals yet! Ask a parent to add some.</Text>
+              <Text style={[styles.emptyMsg, { color: isDarkMode ? '#b0a8d0' : '#bbb' }]}>
+                No goals yet! Ask a parent to add some.
+              </Text>
             )}
             {weeklyGoals.map((goal, i) => {
               const isChecked = checked[goal.id]?.[0] ?? false;
@@ -102,9 +122,13 @@ export default function GoalsTrackerScreen() {
                   <View style={[styles.dayBadge, { backgroundColor: isChecked ? '#c0a8e8' : '#f0d0e8' }]}>
                     <Text style={styles.dayBadgeText}>{DAYS[i % 7]}</Text>
                   </View>
-                  <Text style={styles.goalText}>{goal.text}</Text>
+                  <Text style={[styles.goalText, { color: theme.text }]}>{goal.text}</Text>
                   <Pressable
-                    style={[styles.goalCheck, isChecked && styles.goalCheckDone]}
+                    style={[
+                      styles.goalCheck,
+                      { borderColor: isDarkMode ? '#6060a0' : '#aaa' },
+                      isChecked && styles.goalCheckDone,
+                    ]}
                     onPress={() => toggleCheck(goal.id, 0)}
                   >
                     {isChecked && <Text style={styles.checkmark}>✓</Text>}
@@ -114,17 +138,20 @@ export default function GoalsTrackerScreen() {
             })}
           </View>
 
-          <View style={styles.card}>
+          <View style={[styles.card, { backgroundColor: cardBg }]}>
             <View style={styles.notesHeader}>
               <Text style={styles.sectionTitle}>NOTES</Text>
             </View>
             <TextInput
-              style={styles.notesInput}
+              style={[styles.notesInput, {
+                backgroundColor: isDarkMode ? 'rgba(255,255,255,0.06)' : '#fff',
+                color: theme.text,
+              }]}
               multiline
               value={notes}
               onChangeText={handleNotesChange}
               onKeyPress={handleNotesKeyPress}
-              placeholderTextColor="#bbb"
+              placeholderTextColor={isDarkMode ? '#b0a8d0' : '#bbb'}
               textAlignVertical="top"
             />
           </View>
@@ -152,19 +179,17 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   backBtn: {
-    backgroundColor: 'rgba(255,255,255,0.5)',
     borderRadius: 20,
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backText: { fontSize: 20, color: '#555' },
+  backText: { fontSize: 20 },
   headerTextArea: { flex: 1 },
-  headerTitle: { fontSize: 24, fontWeight: 'bold', color: '#333' },
+  headerTitle: { fontSize: 24, fontWeight: 'bold' },
   headerSub: { fontSize: 13, fontWeight: '600', color: '#e06080' },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.75)',
     borderRadius: 18,
     padding: 14,
     marginBottom: 16,
@@ -199,14 +224,13 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     gap: 4,
   },
-  choreNum: { fontSize: 12, color: '#666', width: 18 },
-  choreText: { flex: 1, fontSize: 13, color: '#333', fontWeight: '500' },
+  choreNum: { fontSize: 12, width: 18 },
+  choreText: { flex: 1, fontSize: 13, fontWeight: '500' },
   checkRow: { flexDirection: 'row', gap: 3 },
   checkbox: {
     width: 22,
     height: 22,
     borderWidth: 1.5,
-    borderColor: '#aaa',
     borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
@@ -228,12 +252,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dayBadgeText: { fontSize: 12, fontWeight: '700', color: '#9b6fd4' },
-  goalText: { flex: 1, fontSize: 13, color: '#333', fontWeight: '500' },
+  goalText: { flex: 1, fontSize: 13, fontWeight: '500' },
   goalCheck: {
     width: 22,
     height: 22,
     borderWidth: 1.5,
-    borderColor: '#aaa',
     borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
@@ -247,18 +270,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   notesInput: {
-    backgroundColor: '#fff',
     borderRadius: 8,
     padding: 10,
     fontSize: 14,
-    color: '#333',
     minHeight: 120,
     textAlignVertical: 'top',
     lineHeight: 22,
   },
   emptyMsg: {
     fontSize: 13,
-    color: '#bbb',
     textAlign: 'center',
     paddingVertical: 12,
     fontStyle: 'italic',

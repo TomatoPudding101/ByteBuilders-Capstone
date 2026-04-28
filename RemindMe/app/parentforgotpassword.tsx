@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { useTheme } from './ThemeContext';
 
 export default function ParentForgotPassword() {
   const [email, setEmail] = useState('');
   const router = useRouter();
+  const { isDarkMode, theme } = useTheme();
 
   const handleSend = () => {
     if (!email) {
@@ -16,27 +18,37 @@ export default function ParentForgotPassword() {
     router.back();
   };
 
+  const gradientColors: [string, string, string, string] = isDarkMode
+    ? ['#0f0f1a', '#1a1035', '#150d2e', '#0f0f1a']
+    : ['#fde8d0', '#f8c8d4', '#d4c8f0', '#c8e0f0'];
+
   return (
     <LinearGradient
-      colors={['#fde8d0', '#f8c8d4', '#d4c8f0', '#c8e0f0']}
+      colors={gradientColors}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-      <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-        <Text style={styles.backText}>←</Text>
+      <TouchableOpacity
+        style={[styles.backBtn, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.5)' }]}
+        onPress={() => router.back()}
+      >
+        <Text style={[styles.backText, { color: theme.text }]}>←</Text>
       </TouchableOpacity>
 
       <Text style={styles.title}>Forgot{'\n'}Password?</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>Enter Parent/Guardian{'\n'}Email</Text>
+      <View style={[styles.card, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(200,185,185,0.45)' }]}>
+        <Text style={[styles.label, { color: theme.text }]}>Enter Parent/Guardian{'\n'}Email</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, {
+            backgroundColor: isDarkMode ? 'rgba(255,255,255,0.10)' : 'rgba(255,245,248,0.85)',
+            color: theme.text,
+          }]}
           value={email}
           onChangeText={setEmail}
           placeholder="---"
-          placeholderTextColor="#bbb"
+          placeholderTextColor={isDarkMode ? '#a09cc0' : '#bbb'}
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -60,14 +72,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 56,
     left: 16,
-    backgroundColor: 'rgba(255,255,255,0.5)',
     borderRadius: 20,
     width: 40,
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backText: { fontSize: 20, color: '#555' },
+  backText: { fontSize: 20 },
   title: {
     fontSize: 38,
     fontWeight: 'bold',
@@ -77,21 +88,18 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '100%',
-    backgroundColor: 'rgba(200,185,185,0.45)',
     borderRadius: 20,
     padding: 28,
     alignItems: 'center',
     gap: 16,
   },
-  label: { fontSize: 16, fontWeight: '700', color: '#333', textAlign: 'center' },
+  label: { fontSize: 16, fontWeight: '700', textAlign: 'center' },
   input: {
     width: '100%',
-    backgroundColor: 'rgba(255,245,248,0.85)',
     borderRadius: 12,
     paddingVertical: 14,
     paddingHorizontal: 16,
     fontSize: 15,
-    color: '#333',
   },
   sendText: {
     fontSize: 20,
