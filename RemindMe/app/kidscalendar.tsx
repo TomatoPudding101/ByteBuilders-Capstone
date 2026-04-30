@@ -3,6 +3,7 @@ import {
   Lexend_700Bold,
   useFonts,
 } from "@expo-google-fonts/lexend";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   Dimensions,
@@ -80,6 +81,7 @@ export default function CalendarScreen() {
     setCurrentDate(newDate);
   };
 
+// going back to the current date regardless of space
   const goToToday = () => {
     const today = new Date();
     setCurrentDate(today);
@@ -162,6 +164,10 @@ export default function CalendarScreen() {
 
   return (
     <View style={[styles.background, { backgroundColor: theme.bg }]}>
+      <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+        <Text style={styles.backText}>←</Text>
+      </TouchableOpacity>
+
       <View style={styles.header}>
         <TouchableOpacity onPress={() => changeMonth(-1)}>
           <Text style={[styles.nav, { color: theme.text }]}>◀</Text>
@@ -203,7 +209,7 @@ export default function CalendarScreen() {
         style={[styles.todayBtn, { backgroundColor: theme.accent }]}
         onPress={goToToday}
       >
-        <Text style={styles.todayText}>Today</Text>
+        <Text style={styles.todayText}>Go to Today</Text>
       </TouchableOpacity>
 
       <View style={styles.dailyContainer}>
@@ -219,7 +225,7 @@ export default function CalendarScreen() {
               (events[selectedDate.toDateString()] || []).map(
                 (event, index) => (
                   <Text key={index} style={styles.dailyEvent}>
-                    • {event}
+                    º {event}
                   </Text>
                 )
               )
@@ -230,7 +236,7 @@ export default function CalendarScreen() {
               onPress={() => setModalVisible(true)}
             >
               <Text style={{ color: "white", fontFamily: "Lexend_700Bold" }}>
-                + Add Event
+                + Add Reminder
               </Text>
             </TouchableOpacity>
           </>
@@ -245,7 +251,7 @@ export default function CalendarScreen() {
             </Text>
 
             <TextInput
-              placeholder="Add event..."
+              placeholder="Add the reminder"
               value={newEvent}
               onChangeText={setNewEvent}
               style={styles.input}
@@ -254,7 +260,7 @@ export default function CalendarScreen() {
 
             <TouchableOpacity style={styles.addBtn} onPress={addEvent}>
               <Text style={{ color: "white", fontFamily: "Lexend_700Bold" }}>
-                Add Event
+                Add Reminder
               </Text>
             </TouchableOpacity>
 
@@ -268,139 +274,51 @@ export default function CalendarScreen() {
   );
 }
 
+// styles and design 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    paddingTop: 40,
-  },
+background: { flex: 1, paddingTop: 40, },
 
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    marginBottom: 10,
-  },
+  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20, marginBottom: 10,},
 
-  nav: {
-    fontSize: 26,
-    fontFamily: "Lexend_700Bold",
-  },
+  nav: { fontSize: 26, fontFamily: "Lexend_700Bold", },
 
-  monthText: {
-    fontSize: 32,
-    fontFamily: "Lexend_700Bold",
-  },
+  monthText: { fontSize: 32, fontFamily: "Lexend_700Bold", },
 
-  yearText: {
-    fontSize: 14,
-    fontFamily: "Lexend_400Regular",
-    opacity: 0.7,
-  },
+  yearText: { fontSize: 14, fontFamily: "Lexend_400Regular", opacity: 0.7, },
 
-  daysRow: {
-    flexDirection: "row",
-    paddingHorizontal: 10,
-    marginBottom: 5,
-  },
+  daysRow: { flexDirection: "row", paddingHorizontal: 10, marginBottom: 5, },
 
-  dayHeader: {
-    textAlign: "center",
-    fontFamily: "Lexend_700Bold",
-    fontSize: 12,
-  },
+  dayHeader: { textAlign: "center", fontFamily: "Lexend_700Bold", fontSize: 12, },
 
-  dayBox: {
-    aspectRatio: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  dayBox: { aspectRatio: 1, justifyContent: "center", alignItems: "center", },
 
-  todayBtn: {
-    marginHorizontal: 150,
-    marginTop: 10,
-    paddingVertical: 10,
-    borderRadius: 12,
-    alignItems: "center",
-  },
+  todayBtn: { marginHorizontal: 150, marginTop: 10, paddingVertical: 10, borderRadius: 12, alignItems: "center", },
 
-  todayText: {
-    color: "white",
-    fontFamily: "Lexend_700Bold",
-    fontSize: 16,
-  },
+  todayText: { color: "white", fontFamily: "Lexend_700Bold", fontSize: 16, },
 
-  dailyContainer: {
-    marginTop: 10,
-    marginHorizontal: 16,
-    padding: 16,
-    borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.95)",
-  },
+  dailyContainer: { marginTop: 10, marginHorizontal: 16, padding: 16, borderRadius: 16, backgroundColor: "rgba(255,255,255,0.95)", },
 
-  dailyTitle: {
-    fontSize: 20,
-    fontFamily: "Lexend_700Bold",
-    marginBottom: 10,
-  },
+  dailyTitle: {fontSize: 20, fontFamily: "Lexend_700Bold", marginBottom: 10, },
 
-  dailyEvent: {
-    fontSize: 16,
-    marginVertical: 4,
-    fontFamily: "Lexend_400Regular",
-  },
+  dailyEvent: { fontSize: 16, marginVertical: 4, fontFamily: "Lexend_400Regular", },
 
-  noEvents: {
-    fontSize: 14,
-    opacity: 0.6,
-    fontFamily: "Lexend_400Regular",
-  },
+  noEvents: { fontSize: 14, opacity: 0.6, fontFamily: "Lexend_400Regular",},
 
-  quickAddBtn: {
-    marginTop: 12,
-    padding: 10,
-    borderRadius: 10,
-    alignItems: "center",
-  },
+  quickAddBtn: { marginTop: 12, padding: 10, borderRadius: 10, alignItems: "center", },
 
-  modal: {
-    flex: 1,
-    backgroundColor: "#00000088",
-    justifyContent: "center",
-  },
+  modal: { flex: 1, backgroundColor: "#00000088", justifyContent: "center", },
 
-  modalContent: {
-    backgroundColor: "white",
-    margin: 20,
-    padding: 20,
-    borderRadius: 12,
-  },
+  modalContent: { backgroundColor: "white", margin: 20, padding: 20, borderRadius: 12, },
 
-  modalTitle: {
-    fontSize: 18,
-    fontFamily: "Lexend_700Bold",
-  },
+  modalTitle: { fontSize: 18, fontFamily: "Lexend_700Bold", },
 
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    marginVertical: 10,
-    padding: 10,
-    borderRadius: 8,
-    fontFamily: "Lexend_400Regular",
-  },
+  input: { borderWidth: 1, borderColor: "#ccc", marginVertical: 10, padding: 10, borderRadius: 8, fontFamily: "Lexend_400Regular", },
 
-  addBtn: {
-    backgroundColor: "#14452F",
-    padding: 12,
-    alignItems: "center",
-    borderRadius: 8,
-  },
+  addBtn: { backgroundColor: "#14452F", padding: 12, alignItems: "center", borderRadius: 8, },
 
-  closeText: {
-    color: "red",
-    marginTop: 10,
-    textAlign: "center",
-    fontFamily: "Lexend_700Bold",
-  },
+  closeText: { color: "red", marginTop: 10, textAlign: "center", fontFamily: "Lexend_700Bold",},
+  
+  backText: {fontSize: 20, color: '#555' },
+  
+  backBtn: { backgroundColor: 'rgba(255,255,255,0.5)', borderRadius: 20, width: 40, height: 40, alignItems: 'center', justifyContent: 'center', },
 });
