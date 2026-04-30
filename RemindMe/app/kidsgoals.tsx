@@ -1,13 +1,18 @@
-import { useState } from 'react';
-import {
-  View, Text, TouchableOpacity, StyleSheet,
-  ScrollView, TextInput, Pressable
-} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import CelebrationBanner from '../components/CelebrationBanner';
 import { useAppState } from '../context/AppContext';
 import { useTheme } from './ThemeContext';
-import CelebrationBanner from '../components/CelebrationBanner';
 
 const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
@@ -66,7 +71,7 @@ export default function GoalsTrackerScreen() {
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
 
-          <View style={[styles.card, { backgroundColor: cardBg }]}>
+        <View style={[styles.card, { backgroundColor: cardBg }]}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Daily Chores</Text>
               <View style={styles.dayRow}>
@@ -81,8 +86,12 @@ export default function GoalsTrackerScreen() {
               </Text>
             )}
             {chores.map((chore, ri) => (
-              <View key={chore.id} style={styles.choreRow}>
-                <Text style={[styles.choreNum, { color: isDarkMode ? '#b0a8d0' : '#666' }]}>{ri + 1}.</Text>
+              <TouchableOpacity
+              key={chore.id}
+              style={styles.choreRow}
+              onPress={() => router.push({ pathname: '/kidstimer', params: { task: chore.text } })}
+            >
+              <Text style={[styles.choreNum, { color: isDarkMode ? '#b0a8d0' : '#666' }]}>{ri + 1}.</Text>
                 <Text style={[styles.choreText, { color: theme.text }]}>{chore.text}</Text>
                 <View style={styles.checkRow}>
                   {DAYS.map((_, ci) => {
@@ -102,7 +111,7 @@ export default function GoalsTrackerScreen() {
                     );
                   })}
                 </View>
-              </View>
+                </TouchableOpacity>
             ))}
           </View>
 
