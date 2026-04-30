@@ -65,8 +65,8 @@ export default function ParentSettings() {
   };
 
   const notificationSettings = [
-    { label: 'Push Notifications', desc: 'Get reminded about tasks', value: pushNotifications, set: setPushNotifications, color: '#5588e0' },
-    { label: 'Sound Effects',      desc: 'Play sounds for actions',   value: soundEffects,      set: setSoundEffects,      color: '#3cc470' },
+    { label: 'Push Notifications', desc: 'Get reminded about tasks, Coming soon!', value: pushNotifications, set: setPushNotifications, color: '#5588e0' },
+    { label: 'Sound Effects',      desc: 'Play sounds for actions, Coming soon!',   value: soundEffects,      set: setSoundEffects,      color: '#3cc470' },
     { label: 'Timer Reminders',    desc: 'Notify when timer ends',    value: timerReminders,    set: setTimerReminders,    color: '#e040a0' },
     { label: 'Goal Reminders',     desc: 'Daily goal check-ins',      value: goalReminders,     set: setGoalReminders,     color: '#9b6fd4' },
   ];
