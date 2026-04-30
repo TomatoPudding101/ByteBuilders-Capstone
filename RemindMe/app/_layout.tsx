@@ -1,10 +1,10 @@
-import { ThemeProvider } from "./ThemeContext";
-import { UserProvider } from "./userContext";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
-import { RewardsProvider } from "./rewardContext";
 import { AppProvider } from "../context/AppContext";
+import { RewardsProvider } from "./rewardContext";
+import { ThemeProvider } from "./ThemeContext";
+import { UserProvider } from "./userContext";
 
 export default function RootLayout() {
   return (
@@ -35,6 +35,12 @@ export default function RootLayout() {
               <Stack.Screen name="parentlogin" options={{ headerShown: false }} />
               <Stack.Screen name="parentsettings" options={{ headerShown: false }} />
               <Stack.Screen name="parentforgotpassword" options={{ headerShown: false }} />
+              <Stack.Screen name="kidsroadmap" options={{ headerShown: false }} />
+              <Stack.Screen name="whackamole" options={{ headerShown: false }} />
+              <Stack.Screen name="solvemaze" options={{ headerShown: false }} />
+              <Stack.Screen name="stopgame" options={{ headerShown: false }} />
+
+
             </Stack>
             <StatusBar style="auto" />
           </RewardsProvider>
