@@ -1,14 +1,23 @@
 import {
-  View, Text, TouchableOpacity, StyleSheet, ScrollView
-} from 'react-native';
+  LexendExa_400Regular,
+  LexendExa_600SemiBold,
+  LexendExa_700Bold,
+  useFonts,
+} from "@expo-google-fonts/lexend-exa";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import {
+  ScrollView,
+  StyleSheet,
+  Text, TouchableOpacity,
+  View
+} from 'react-native';
 import { useAppState } from '../context/AppContext';
 import { useTheme } from './ThemeContext';
 
 const REWARDS = [
-  { id: 1, label: 'Unlock 2 profile characters', points: 5,   color: '#c8a8e8', dark: '#7040b0', icon: '👤' },
-  { id: 2, label: 'Choose your background',      points: 10,  color: '#a8d8c8', dark: '#208060', icon: '🖼️' },
+  { id: 1, label: 'Change your user character',  points: 5,   color: '#c8a8e8', dark: '#7040b0', icon: '🐻' },
+  { id: 2, label: 'Play mini game',              points: 10,  color: '#a8d8c8', dark: '#208060', icon: '🎮' },
   { id: 3, label: 'Special surprise!',           points: 25,  color: '#a8c8e8', dark: '#205090', icon: '🎁' },
   { id: 4, label: '15 min extra screen time',    points: 50,  color: '#f8d8a8', dark: '#905010', icon: '📱' },
   { id: 5, label: 'Stay up 15 min later',        points: 75,  color: '#f8c8d0', dark: '#902040', icon: '🌙' },
@@ -21,6 +30,12 @@ export default function KidsRewards() {
   const router = useRouter();
   const { totalPoints } = useAppState();
   const { isDarkMode, theme } = useTheme();
+  const [fontsLoaded] = useFonts({
+    LexendExa_400Regular,
+    LexendExa_600SemiBold,
+    LexendExa_700Bold,
+  });
+  if (!fontsLoaded) return null;
 
   const gradientColors: [string, string, string, string] = isDarkMode
     ? ['#0f0f1a', '#1a1035', '#150d2e', '#0f0f1a']
@@ -95,6 +110,13 @@ export default function KidsRewards() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+      <TouchableOpacity
+        style={styles.roadmapBtn}
+        onPress={()=> router.push('/kidsroadmap')}
+      >
+        <Text style={styles.roadmapText}>G A M E S</Text>
+      </TouchableOpacity>
+
     </LinearGradient>
   );
 }
@@ -110,12 +132,11 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   backBtn: {
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.5)', borderRadius: 20,
+    width: 40, height: 40, alignItems: 'center', justifyContent: 'center',
   },
+
+
   backText: { fontSize: 20 },
   headerTitle: { fontSize: 24, fontWeight: 'bold' },
   headerSub: { fontSize: 13, fontWeight: '600', color: '#e06080' },
@@ -158,6 +179,25 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '800',
     color: '#fff',
+  },
+  roadmapBtn: {
+    position: 'absolute',
+    top: 65,
+    right: 20,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    borderRadius: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    elevation: 5,
+  },
+  roadmapText:
+  {
+    fontFamily: "LexendExa_600SemiBold",
+    fontSize: 15,
+    color: '#000',
   },
   parentNote: {
     borderRadius: 14,
